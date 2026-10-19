@@ -53,7 +53,7 @@ The problem domains are the cut for snapshot skills. Their names follow the cut 
 | `smart-authentication` | Access tokens: issuing, obtaining, caching, validating, forwarding | `AuthTokenHandling` |
 | `smart-persistence-entityframework-fusefx` | Data access via FUSE-fx and Entity Framework | `FUSE-fx.RepositoryContract`, `FUSE-fx.ModelDescription`, `FUSE-fx.ModelReader`, `FUSE-fx.EntityAnnotations`, `FUSE-fx.ModelDesigner`, `FUSE-fx.DynDB-EF`, `FUSE-fx.DynDB-JSONfs`, `FUSE-fx.DynDB-XLS`, `FUSE-fx.DynDB-SQL`, `FUSE-fx.WinForms`, `json-flatfile-datastore.FUSE-fx`, `EntityFrameworkCore.DataAccessFilter` |
 | `smart-versioning-and-nuget` | Changelog-driven semantic versioning, packaging | `VersioningUtil` (KVU) |
-| `smart-solution-and-project-structure` | Common repository conventions and the ASP.NET Core hosting template: shared projects, multi-targeting (net48/net8/net10), generated versioning artifacts, documentation layout | `AspNetCoreTemplate`; conventions of all .NET repositories (see their `most-important-details-for-*` skills) |
+| `smart-solution-and-project-structure` (exists; template only so far) | Common repository conventions and the ASP.NET Core hosting template: shared projects, multi-targeting (net48/net8/net10), generated versioning artifacts, documentation layout | `AspNetCoreTemplate`; conventions of all .NET repositories (see their `most-important-details-for-*` skills) |
 | `smart-ushell-and-universalbff` | UShell frontend shell and the UniversalBFF backend-for-frontend | `UShell.*` (all `ProjectUShell` repositories), `UniversalBFF` |
 
 Not yet assigned to a domain (no established counterpart; see `Refinement Needed`): `Logging`, `Snowflake44`, `Essentials`, `AbstractFileSystem`, `AiSupport`, `UniversalWorkItem.Contract`, `CefSharp.Wrapped`, `KnowledgeManagement`.
@@ -80,7 +80,7 @@ Keep rows short. "Local folder" is only filled where developers commonly use a f
 | `AI-SKILLS-SMART` | | Snapshot skills and index of this landscape; leading source of `include-additional-mandatory-skills`. | (this repository) | - | |
 | `AddressResolving` | `EndpointDiscovery` | Endpoint / address resolving (service registry). | `most-important-details-for-endpoint-discovery` | - | Formerly `KornSW/KswServiceRegistry`; old spelling `AddressRessolving` redirects. |
 | `AiSupport` | | Provider-neutral .NET contracts for AI-enabled applications, standard implementations, ASP.NET Core integration, AI harness. | `ai-harness-development`, `most-important-details-for-smartstandards-aisupport` | - | |
-| `AspNetCoreTemplate` | `SmartStandards.AspNetCoreTemplate` | ASP.NET Core startup and hosting template; package `SmartStandards.WebApiDependencies`. | - | - | |
+| `AspNetCoreTemplate` | `SmartStandards.AspNetCoreTemplate` | ASP.NET Core startup and hosting template; package `SmartStandards.WebApiDependencies`. | `most-important-details-for-smartstandards-aspnetcore-template` | `smart-solution-and-project-structure` | |
 | `AuthTokenHandling` | | Issuing, obtaining, caching, validating and forwarding access tokens. | `auth-token-handling`, `most-important-details-for-auth-token-handling` | - | Successor of `KornSW/KornSW.TokenValidation`. |
 | `CefSharp.Wrapped` | | C# convenience wrapper for CefSharp (extracted from `W3bstract`). | - | - | |
 | `CyclicTriggering` | | `ICyclicTriggerReceiver` abstraction and .NET implementation for cyclic triggers. | `most-important-details-for-cyclic-triggering` | - | |

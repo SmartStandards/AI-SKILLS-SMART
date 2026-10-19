@@ -7,7 +7,7 @@ metadata:
 
 # Skill Maintaining Guidelines (AI-SKILLS-SMART)
 
-This skill is the rulebook of this repository. Every skill in `.agents/skills/` other than this one is a **snapshot skill** and must follow the rules below, unless it is listed as a template or index skill.
+This skill is the rulebook of this repository. Every skill in `.agents/skills/` other than this one is a **snapshot skill** and must follow the rules below, unless it is listed as a template, index or general skill.
 
 ### Index Skills
 
@@ -20,6 +20,14 @@ Index skills are not snapshots and are never copied into other repositories. The
 Template skills are not snapshots. This repository is their leading source; they may be used directly from here and may also be duplicated into other repositories. Copies are downstream: improve the template here first, then roll it out. Template skills follow the admission and neutrality rules, but not the snapshot naming prefix, the three layers or the snapshot status block.
 
 - `include-additional-mandatory-skills`
+
+### General Skills
+
+General skills are not snapshots of one repository but cross-cutting, publishable knowledge about working with the landscape. This repository is their leading source. They follow the admission and neutrality rules, but not the snapshot naming prefix, the three layers or the snapshot status block.
+
+- `master-architect` - capability-first architecture and wire-up reasoning.
+- `additional-fields-via-smart-extensiondata` - round-tripping unknown JSON fields via the SmartExtensionBag pattern.
+- `dotnet-t4-source-embedding` - embedding foreign C# sources via T4 templates instead of package references.
 
 ## Purpose of This Repository
 
@@ -149,8 +157,9 @@ If upstream sources are not reachable, say so, continue with the snapshot only w
 
 1. Check existing snapshot skills first; extend one if the domain fits instead of creating an overlapping skill.
 2. Check the admission rule and the visibility of every repository in scope. Read the upstream skills, README and docs of every repository in scope. Never write a snapshot from memory alone.
-3. Fill the three layers, set the snapshot date to today and record the synchronized versions.
-4. Add the skill to the index in the repository `README.md` and to the `Snapshot` column of `smart-standards-library-ecosystem`.
+3. Make sure every statement the snapshot will contain exists upstream first. If knowledge originated outside the upstream repositories (e.g. from analyzing source code, a predecessor skill, or a pasted fragment) and the repository has no skill covering it yet, create or extend its `most-important-details-for-*` skill first (see `Writing Knowledge Back Upstream`). The upstream repository is the leading home of the knowledge, even when the snapshot was conceived first.
+4. Fill the three layers, set the snapshot date to today and record the synchronized versions.
+5. Add the skill to the index in the repository `README.md` and to the `Snapshot` column of `smart-standards-library-ecosystem`.
 
 ### Refresh
 
@@ -170,7 +179,7 @@ Work in this repository may produce new knowledge about a problem domain (e.g. f
 1. **Find the owner.** Determine the owning repository via `smart-standards-library-ecosystem` and its full-version skill (e.g. `ujmw`, `fuse-fx`, `ushell-*` in `UShell.Docs`), or the repository's `most-important-details-for-*` skill for repository-specific implementation details.
 2. **Use a local clone.** Write only into a local clone of the upstream repository. If none exists, ask the user to clone it (the user chooses the Git root).
 3. **Follow the upstream repository's rules.** Load its `include-additional-mandatory-skills` copy and its `most-important-details-for-*` skill first. Respect its documentation layout (`/doc`, never `changelog.md`) and its skill format.
-4. **Upstream first, snapshot second.** Write the knowledge into the full-version skill (or `/doc`) first, then refresh the affected snapshot skill from it. Never place knowledge only in a snapshot.
+4. **Upstream first, snapshot second.** Write the knowledge into the full-version skill (or `/doc`) first, then refresh the affected snapshot skill from it. Never place knowledge only in a snapshot - also not temporarily, and also not when the snapshot existed before the upstream skill.
 5. **Keep it public.** The admission and neutrality rules apply in full: upstream repositories are public. No organization names, internal URLs, personal notes or machine-specific paths.
 6. **Show and confirm.** Present the planned upstream change briefly (target repository, skill, section) before writing. Commit or push only when the user asks; report which repositories were changed.
 

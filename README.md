@@ -13,3 +13,7 @@ How snapshot skills are built, refreshed and retired is defined in [smart-skill-
 | [smart-skill-maintaining-guidelines](.agents/skills/smart-skill-maintaining-guidelines/SKILL.md) | Rules of this repository (not a snapshot) | - | 2026-10-19 |
 | [smart-standards-library-ecosystem](.agents/skills/smart-standards-library-ecosystem/SKILL.md) | Index of all repositories of the landscape (not a snapshot, not copied) | all | - |
 | [include-additional-mandatory-skills](.agents/skills/include-additional-mandatory-skills/SKILL.md) | Template skill (leading source here, may be duplicated) | - | - |
+| [master-architect](.agents/skills/master-architect/SKILL.md) | General skill: capability-first architecture and wire-up reasoning (not a snapshot) | - | - |
+| [additional-fields-via-smart-extensiondata](.agents/skills/additional-fields-via-smart-extensiondata/SKILL.md) | General skill: unknown JSON fields via SmartExtensionBag (not a snapshot) | - | - |
+| [dotnet-t4-source-embedding](.agents/skills/dotnet-t4-source-embedding/SKILL.md) | General skill: embedding foreign C# sources via T4 (not a snapshot) | - | - |
+| [smart-solution-and-project-structure](.agents/skills/smart-solution-and-project-structure/SKILL.md) | Repository conventions and the ASP.NET Core hosting template (currently the template only) | `AspNetCoreTemplate` | 2026-10-19 |
