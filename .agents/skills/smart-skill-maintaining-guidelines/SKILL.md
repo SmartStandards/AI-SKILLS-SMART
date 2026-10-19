@@ -1,13 +1,19 @@
 ---
-name: smart-snapshot-skill-guidelines
-description: MANDATORY and AUTHORITATIVE for ALL work inside this repository (AI-SKILLS-SMART) - load FIRST, before creating, editing, reviewing, refreshing, renaming or deleting any skill here. Defines how this repository consolidates the official, public SmartStandards and UShell open-source landscape (incl. selected public KornSW repositories) into snapshot skills - compact buffer skills per problem domain with cached essentials, a snapshot date with staleness alarm logic, and an escalation edge pointing to the upstream Git repositories and their own skills. Also load whenever a snapshot skill from this repository is consumed and its age, its staleness alarm, or the decision to escalate to the upstream repository is in question.
+name: smart-skill-maintaining-guidelines
+description: MANDATORY and AUTHORITATIVE for ALL work inside this repository (AI-SKILLS-SMART) - load FIRST, before creating, editing, reviewing, refreshing, renaming or deleting any skill here. Defines how this repository consolidates the official, public SmartStandards and UShell open-source landscape (incl. selected public KornSW repositories) into snapshot skills - compact buffer skills per problem domain with cached essentials, a snapshot date with staleness alarm logic, and an escalation edge pointing to the upstream Git repositories and their own skills - and how new knowledge is written back into the upstream problem-domain repositories and their full-version skills. Also load whenever a snapshot skill from this repository is consumed and its age, its staleness alarm, or the decision to escalate to the upstream repository is in question.
 metadata:
   snapshot-date: "2026-10-19"
 ---
 
-# Snapshot Skill Guidelines (AI-SKILLS-SMART)
+# Skill Maintaining Guidelines (AI-SKILLS-SMART)
 
-This skill is the rulebook of this repository. Every skill in `.agents/skills/` other than this one is a **snapshot skill** and must follow the rules below, unless it is listed as a template skill.
+This skill is the rulebook of this repository. Every skill in `.agents/skills/` other than this one is a **snapshot skill** and must follow the rules below, unless it is listed as a template or index skill.
+
+### Index Skills
+
+Index skills are not snapshots and are never copied into other repositories. They carry the `smart-` prefix but not the three layers or the snapshot status block; they are versioned via `metadata.version`.
+
+- `smart-standards-library-ecosystem` - the phone book of the landscape: all admitted and excluded repositories, owners, clone URLs, roles, problem domains, upstream skills and snapshot skills. Every new snapshot skill is registered there.
 
 ### Template Skills
 
@@ -38,7 +44,7 @@ Admitted GitHub owners:
 | --- | --- |
 | `SmartStandards` | Public repositories are admitted. |
 | `ProjectUShell` | Public repositories are admitted. `UShell.FrontendBundle` belongs to the landscape but is temporarily private: do not snapshot it until it is public. |
-| `KornSW` | Exception: only public repositories that belong to the SmartStandards / UShell development landscape. This owner also hosts unrelated public repositories (e.g. WordPress plugins, home automation, forks); these are not admitted. Admitted: `ComponentDiscovery`, `UniversalBFF`, `AmbientScoping`, `VersioningUtil` (KVU), `AbstractFileSystem`, `EntityFrameworkCore.DataAccessFilter`, `DynamicProxy`. Excluded (legacy): `KornSW.AccessControl`, `KornSW.TokenValidation`, `T4Framework`, `kGEN`, `W3bstract`, `W3bstract.Core`, `EntityFrameworkCore.ModelFirst`. Excluded (proof of concept): `LiteDB.FUSE-fx`. Ask the user before admitting any other `KornSW` repository, then add it to this list. |
+| `KornSW` | Exception: only public repositories that belong to the SmartStandards / UShell development landscape. This owner also hosts unrelated public repositories (e.g. WordPress plugins, home automation, forks); these are not admitted. The admitted and excluded repositories are listed in `smart-standards-library-ecosystem`. Ask the user before admitting any other `KornSW` repository, then add it there. |
 
 Private repositories are never admitted, regardless of owner. Verify visibility before creating or refreshing a snapshot, e.g. via the public GitHub API without authentication: `https://api.github.com/repos/<owner>/<repo>` returns `"visibility": "public"` for public repositories and HTTP 404 for private or non-existent ones. If a referenced repository has become private, remove it from the snapshot and tell the user.
 
@@ -55,7 +61,7 @@ Applies to every skill and document in this repository:
 - `C:\GIT\` and every folder matching `C:\GIT-*\` (Windows) as well as `~/GIT/` and `~/GIT-*/` (Linux) are equivalent Git roots. Never hard-code a concrete root matching `GIT-*`; use the pattern.
 - Every repository folder matching `AI-SKILLS` or `AI-SKILLS-*` in a Git root is to be indexed as a skill consolidation repository. Repository folders matching `*-Docs` or `*.Docs` are indexed as well, but only if already cloned locally. Hard-code a concrete `AI-SKILLS-*` folder name only after explicit user confirmation. Confirmed: `AI-SKILLS-SMART`.
 - When another consolidation repository is referenced, document its Git clone URL. When running locally and the repository is missing, ask the user to clone it; the user chooses the Git root.
-- `AI-SKILLS-SMART` (`https://github.com/SmartStandards/AI-SKILLS-SMART.git`) may have organization-internal forks (mirrors). Organization-internal skills reference their internal mirror as clone URL instead. Never name such organizations or mirrors here.
+- `AI-SKILLS-SMART` (`https://github.com/SmartStandards/AI-SKILLS-SMART.git`) and other listed consolidation repositories (e.g. `UShell.Docs`) may have organization-internal forks (mirrors). Organization-internal skills reference their internal mirror as clone URL instead. Never name such organizations or mirrors here.
 - The details for agents are defined in the template skill `include-additional-mandatory-skills`; keep both consistent.
 
 ## The Three Layers of a Snapshot Skill
@@ -70,6 +76,7 @@ Every snapshot skill has exactly these three layers, in this order:
 
 ### Layer 1 - Domain Overview
 
+- Cut and name problem domains 1:1 like the established domain skills of consuming organizations' skill collections: where such a collection has `<prefix>-<domain>`, the snapshot skill is `smart-<domain>`, so that a consumer's skill and the snapshot pair up. Drop organization- or product-specific name parts; never name the organization. The planned domains are listed in `smart-standards-library-ecosystem`. For repositories without an established counterpart, ask the user before inventing a new domain.
 - Cut along broad problem domains, not along single packages. One snapshot skill may cover several repositories. Avoid micro-skills; the collection should stay small (well below a three-digit number of skills).
 - The `description` states the domain, the main library and package names as keywords, and the trigger situations. Keep it at most 1024 characters (hard limit of the Agent Skills specification), aim well below.
 - State exclusions and name neighboring snapshot skills instead of duplicating their content.
@@ -134,7 +141,7 @@ If upstream sources are not reachable, say so, continue with the snapshot only w
 ### Naming and Location
 
 - Path: `.agents/skills/<skill-name>/SKILL.md`, directory name equals `name`, lower case with hyphens (Agent Skills specification: https://agentskills.io/specification.md).
-- Prefix every snapshot skill with `smart-` (e.g. `smart-http-remoting-ujmw`). This avoids name collisions with upstream skills that may be loaded in the same session.
+- Prefix every snapshot skill with `smart-` (e.g. `smart-http-remoting-standard`). This avoids name collisions with upstream skills that may be loaded in the same session.
 - Write all skill content in English. User communication may use any language.
 - Start new skills from [assets/snapshot-skill-template.md](assets/snapshot-skill-template.md).
 
@@ -143,7 +150,7 @@ If upstream sources are not reachable, say so, continue with the snapshot only w
 1. Check existing snapshot skills first; extend one if the domain fits instead of creating an overlapping skill.
 2. Check the admission rule and the visibility of every repository in scope. Read the upstream skills, README and docs of every repository in scope. Never write a snapshot from memory alone.
 3. Fill the three layers, set the snapshot date to today and record the synchronized versions.
-4. Add the skill to the index in the repository `README.md`.
+4. Add the skill to the index in the repository `README.md` and to the `Snapshot` column of `smart-standards-library-ecosystem`.
 
 ### Refresh
 
@@ -154,7 +161,18 @@ If upstream sources are not reachable, say so, continue with the snapshot only w
 
 ### Conflict Rule
 
-Upstream is authoritative. If a snapshot contradicts its upstream source, the upstream source wins; fix the snapshot. Do not edit upstream repositories from here. If upstream itself is inconsistent, report it to the user and suggest fixing it in the upstream repository.
+Upstream is authoritative. If a snapshot contradicts its upstream source, the upstream source wins; fix the snapshot. If upstream itself is inconsistent, report it to the user and propose a fix in the upstream repository (see `Writing Knowledge Back Upstream`).
+
+## Writing Knowledge Back Upstream
+
+Work in this repository may produce new knowledge about a problem domain (e.g. from user input, troubleshooting, pasted fragments, or comparing several repositories). It is explicitly allowed to write such knowledge from here into the upstream problem-domain repositories and their full-version skills. Knowledge must not end up only in a snapshot.
+
+1. **Find the owner.** Determine the owning repository via `smart-standards-library-ecosystem` and its full-version skill (e.g. `ujmw`, `fuse-fx`, `ushell-*` in `UShell.Docs`), or the repository's `most-important-details-for-*` skill for repository-specific implementation details.
+2. **Use a local clone.** Write only into a local clone of the upstream repository. If none exists, ask the user to clone it (the user chooses the Git root).
+3. **Follow the upstream repository's rules.** Load its `include-additional-mandatory-skills` copy and its `most-important-details-for-*` skill first. Respect its documentation layout (`/doc`, never `changelog.md`) and its skill format.
+4. **Upstream first, snapshot second.** Write the knowledge into the full-version skill (or `/doc`) first, then refresh the affected snapshot skill from it. Never place knowledge only in a snapshot.
+5. **Keep it public.** The admission and neutrality rules apply in full: upstream repositories are public. No organization names, internal URLs, personal notes or machine-specific paths.
+6. **Show and confirm.** Present the planned upstream change briefly (target repository, skill, section) before writing. Commit or push only when the user asks; report which repositories were changed.
 
 ### Retire
 
@@ -167,5 +185,5 @@ Remove or merge a snapshot skill when its domain is discontinued or absorbed int
 - Admission rule met: every upstream repository is public (visibility checked) and owned by an admitted owner (`KornSW` only if listed); no personal developer notes.
 - No consumer, company or customer names; no internal URLs; no machine-specific paths; no references to other skill collections.
 - Escalation edge and upstream URLs present and plausible.
-- `README.md` index updated.
+- `README.md` index and `smart-standards-library-ecosystem` updated.
 - Report what was actually verified against upstream and what was not.

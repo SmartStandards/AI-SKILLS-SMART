@@ -24,7 +24,7 @@ metadata:
 - Staleness thresholds: fresh < 90 days, aging 90-180 days, stale > 180 days
 - Volatility: low | medium | high
 
-Apply the alarm logic from `smart-snapshot-skill-guidelines` before relying on this snapshot.
+Apply the alarm logic from `smart-skill-maintaining-guidelines` before relying on this snapshot.
 
 ## Core Concepts
 
