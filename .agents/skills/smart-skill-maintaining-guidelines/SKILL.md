@@ -28,6 +28,10 @@ General skills are not snapshots of one repository but cross-cutting, publishabl
 - `master-architect` - capability-first architecture and wire-up reasoning.
 - `additional-fields-via-smart-extensiondata` - round-tripping unknown JSON fields via the SmartExtensionBag pattern.
 - `dotnet-t4-source-embedding` - embedding foreign C# sources via T4 templates instead of package references.
+- `asp-net-core-development-guidelines` - designed-state application bootstrap (canonical `Program.Main`, partial hooks) and explicit controller exposure in ASP.NET Core.
+- `csharp-coding-standards` - conservative, explicit C# coding standards and AI implementation rules ("syntactic salt over syntactic sugar").
+- `package-version-preferences-dot-net` - preferred NuGet version ranges, pins, status of competing technologies and reference solutions; reviewed cyclically with the user.
+- `dotnet-sdk-style-project-files` - designed state of SDK-style `.csproj` files: section order, identity, canonical BUILD, project-type modules, feature templates.
 
 ## Purpose of This Repository
 

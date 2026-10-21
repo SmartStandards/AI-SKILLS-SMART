@@ -16,4 +16,8 @@ How snapshot skills are built, refreshed and retired is defined in [smart-skill-
 | [master-architect](.agents/skills/master-architect/SKILL.md) | General skill: capability-first architecture and wire-up reasoning (not a snapshot) | - | - |
 | [additional-fields-via-smart-extensiondata](.agents/skills/additional-fields-via-smart-extensiondata/SKILL.md) | General skill: unknown JSON fields via SmartExtensionBag (not a snapshot) | - | - |
 | [dotnet-t4-source-embedding](.agents/skills/dotnet-t4-source-embedding/SKILL.md) | General skill: embedding foreign C# sources via T4 (not a snapshot) | - | - |
+| [asp-net-core-development-guidelines](.agents/skills/asp-net-core-development-guidelines/SKILL.md) | General skill: designed-state application bootstrap (canonical Program.Main, partial hooks) and explicit controller exposure in ASP.NET Core (not a snapshot) | - | - |
+| [csharp-coding-standards](.agents/skills/csharp-coding-standards/SKILL.md) | General skill: conservative, explicit C# coding standards and AI implementation rules (not a snapshot) | - | - |
+| [package-version-preferences-dot-net](.agents/skills/package-version-preferences-dot-net/SKILL.md) | General skill: preferred NuGet version ranges, pins, competing technologies, reference solutions (not a snapshot) | - | - |
+| [dotnet-sdk-style-project-files](.agents/skills/dotnet-sdk-style-project-files/SKILL.md) | General skill: designed state of SDK-style .csproj files (section order, canonical BUILD, project-type modules) (not a snapshot) | - | - |
 | [smart-solution-and-project-structure](.agents/skills/smart-solution-and-project-structure/SKILL.md) | Repository conventions and the ASP.NET Core hosting template (currently the template only) | `AspNetCoreTemplate` | 2026-10-19 |
