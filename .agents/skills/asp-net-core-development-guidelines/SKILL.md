@@ -28,6 +28,8 @@ Core invariants:
 
 `LaunchProfileHelper` and `AddBranchSpecificConfigurationFiles()` are described in the snapshot skill `smart-solution-and-project-structure`.
 
+When the bootstrap is reviewed as part of bringing a whole solution up to date, follow the procedure in `refactoring-processes` (analysis and plan first, migration only after confirmation).
+
 ## Controller exposure rule
 
 ASP.NET Core controllers provided by SmartStandards libraries SHOULD be hidden from ordinary automatic controller discovery.

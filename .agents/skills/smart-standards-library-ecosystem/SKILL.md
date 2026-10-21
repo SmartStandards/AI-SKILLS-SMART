@@ -2,7 +2,7 @@
 name: smart-standards-library-ecosystem
 description: Index and routing authority for the SmartStandards / UShell open-source library landscape (incl. admitted KornSW repositories) - which repositories exist, their GitHub owner and clone URL, local folder name, role, problem domain, own upstream skills, matching snapshot skill, and which repositories are excluded (legacy, proof of concept, private). Use when an unknown open-source package, repository or component appears; when looking for the repository, clone URL or skills of a library such as FUSE-fx, UJMW, SmartAmbience, ComponentDiscovery, AuthTokenHandling, KVU, UniversalBFF or UShell; before writing helper or cross-cutting code that a library of this landscape may already own; or when asked about the role or successor of a library.
 metadata:
-  version: "2026-10-19b"
+  version: "2026-10-21"
 ---
 
 # SmartStandards Library Ecosystem (Index)
@@ -52,7 +52,7 @@ The problem domains are the cut for snapshot skills. Their names follow the cut 
 | `smart-service-ecosystem` | Endpoint resolution, service registry, cyclic triggering of services | `AddressResolving`, `CyclicTriggering` (?) |
 | `smart-authentication` | Access tokens: issuing, obtaining, caching, validating, forwarding | `AuthTokenHandling` |
 | `smart-persistence-entityframework-fusefx` | Data access via FUSE-fx and Entity Framework | `FUSE-fx.RepositoryContract`, `FUSE-fx.ModelDescription`, `FUSE-fx.ModelReader`, `FUSE-fx.EntityAnnotations`, `FUSE-fx.ModelDesigner`, `FUSE-fx.DynDB-EF`, `FUSE-fx.DynDB-JSONfs`, `FUSE-fx.DynDB-XLS`, `FUSE-fx.DynDB-SQL`, `FUSE-fx.WinForms`, `json-flatfile-datastore.FUSE-fx`, `EntityFrameworkCore.DataAccessFilter` |
-| `smart-versioning-and-nuget` | Changelog-driven semantic versioning, packaging | `VersioningUtil` (KVU) |
+| `nuget-semantic-versioning-kvu` (exists; general skill, named by user decision 2026-10-21) | Changelog-driven semantic versioning, packaging | `VersioningUtil` (KVU) |
 | `smart-solution-and-project-structure` (exists; template only so far) | Common repository conventions and the ASP.NET Core hosting template: shared projects, multi-targeting (net48/net8/net10), generated versioning artifacts, documentation layout | `AspNetCoreTemplate`; conventions of all .NET repositories (see their `most-important-details-for-*` skills) |
 | `smart-ushell-and-universalbff` | UShell frontend shell and the UniversalBFF backend-for-frontend | `UShell.*` (all `ProjectUShell` repositories), `UniversalBFF` |
 
@@ -124,7 +124,9 @@ Keep rows short. "Local folder" is only filled where developers commonly use a f
 | `ComponentDiscovery` | | Assembly resolving, type discovery, taxonomic classification / approval, InstanceDiscovery. | `component-discovery`, `most-important-details-for-component-discovery` | - | |
 | `UniversalBFF` | | ASP.NET Core backend-for-frontend composition layer for UShell and UJMW-based API gateways. | `most-important-details-for-universalbff` | - | |
 | `AmbientScoping` | | Scoped singletons via ambient binding identifiers (incl. distributed dataflow). | ? | - | |
-| `VersioningUtil` | `KVU` | KVU: semantic versioning driven by `changelog.md`. | `kvu-versioning-rules` | - | |
+| `VersioningUtil` | `KVU` | KVU: semantic versioning driven by `changelog.md`. | `kvu-versioning-rules`, `most-important-details-for-kvu` | `nuget-semantic-versioning-kvu` | |
+| `WP-AutoUpdate-G2` | | Template: KVU-like versioning and GitHub-based self-update for WordPress plugins (Python script + GitHub Actions). | - | `nuget-semantic-versioning-kvu` | Admitted by user decision 2026-10-21. |
+| `WP-AuthTokenHandling` | | WordPress plugin using the `WP-AutoUpdate-G2` release template unchanged (reference consumer). | - | `nuget-semantic-versioning-kvu` | Admitted by user decision 2026-10-21 (release mechanism only). |
 | `AbstractFileSystem` | | Abstract file system contracts. | `most-important-details-for-abstract-file-system` | - | Suspended 2019, restarted 2024. |
 | `EntityFrameworkCore.DataAccessFilter` | | Data access filters for EF Core. | `most-important-details-for-efcore-data-access-filter` | - | |
 | `DynamicProxy` | | Generates interface implementations via Emit. | - | - | |
@@ -143,7 +145,7 @@ Not part of this landscape's index; do not snapshot or route to them.
 | `KornSW/EntityFrameworkCore.ModelFirst` | Legacy | ? |
 | `KornSW/LiteDB.FUSE-fx` | Proof of concept | - |
 
-All other public `KornSW` repositories (e.g. WordPress plugins, home automation, forks) are unrelated to this landscape.
+All other public `KornSW` repositories (e.g. other WordPress plugins, home automation, forks) are unrelated to this landscape.
 
 ## Refinement Needed
 

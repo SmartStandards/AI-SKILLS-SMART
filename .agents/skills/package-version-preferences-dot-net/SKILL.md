@@ -9,7 +9,7 @@ metadata:
 
 This general skill records which versions of well-known NuGet packages are preferred and which of competing technologies are wanted. It describes preferences, not the actual versions of a given repository; the `.csproj` / `.nuspec` files of the repository remain the truth for what is used.
 
-Package changes are never a side effect: do not add, upgrade or downgrade packages as part of unrelated work. If a referenced version lies outside the preferred range, report it and ask.
+Package changes are never a side effect: do not add, upgrade or downgrade packages as part of unrelated work. If a referenced version lies outside the preferred range, report it and ask. When a whole solution is brought up to date, this check is aspect A of `refactoring-processes`.
 
 ## 1. Reference Solutions
 

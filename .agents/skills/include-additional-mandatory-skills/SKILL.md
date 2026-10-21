@@ -2,7 +2,7 @@
 name: include-additional-mandatory-skills
 description: MANDATORY entry point for every agent in every repository - load first, before any other work. Defines which additional skill and knowledge sources must be consumed (repository docs, .agents folders up to the file system root, local AI-SKILLS consolidation and Docs repositories such as UShell.Docs in the Git roots, public wikis), how to find or obtain them (indexing patterns, clone URLs, mirrors), how organization-specific twins of this skill interact with it, how to self-install (persist a reference in user memory), and how copies are distributed to repositories and kept up to date.
 metadata:
-  version: "2026-10-19"
+  version: "2026-10-21"
 ---
 
 # Additional Skill Sources to Be Consumed Before Working with a Repository
@@ -15,7 +15,7 @@ Organizations may maintain their own variant of this skill, named `<prefix>-incl
 
 ## 1. Repository Documentation
 
-Read AND maintain the classic, human-readable developer documentation of the current repository in `/doc/*.md`. NEVER touch `changelog.md`; it is maintained by the build process.
+Read AND maintain the classic, human-readable developer documentation of the current repository in `/doc/*.md`. `changelog.md` is maintained by the build process (KVU): agents may only add conformant entries below `## Upcoming Changes` and must never change anything else in it; preferably, communicate changes via commit message prefixes instead (details: skill `nuget-semantic-versioning-kvu` in `AI-SKILLS-SMART`).
 
 ## 2. Skill Format
 

@@ -1,6 +1,6 @@
 ---
 name: csharp-coding-standards
-description: MANDATORY implementation constraint for writing, generating, reviewing or refactoring any C# source code - conservative, explicit C# coding standards ("syntactic salt over syntactic sugar"). Covers no var, explicit types, defensive nullability, _PascalCase fields and constants, this. qualification, expanded properties, XML summary documentation, brace and else/catch/finally layout, no ternary operator, parenthesized lambda parameters, arrays at API boundaries, purposeful exception handling with DevLogger.LogError, trace logging via DevLogger.LogTrace, no async/await by default, Newtonsoft.Json instead of System.Text.Json, no P/Invoke without approval, reserved placeholder syntaxes (_FOO_, #FOO#, {Foo}, [Foo]; prohibited (Foo), %FOO%), migration of existing code, documentation and test deliverables. Load before producing C# code and use its agent checklist before returning code.
+description: MANDATORY implementation constraint for writing, generating, reviewing or refactoring any C# source code - conservative, explicit C# coding standards ("syntactic salt over syntactic sugar"). Covers no var, explicit types, defensive nullability, _PascalCase fields and constants, this. qualification, expanded properties, XML summary documentation, brace and else/catch/finally layout, no ternary operator, parenthesized lambda parameters, arrays at API boundaries, purposeful exception handling with DevLogger.LogError, trace logging via DevLogger.LogTrace, no async/await by default, Newtonsoft.Json instead of System.Text.Json, no P/Invoke without approval, reserved placeholder syntaxes (_FOO_, #FOO#, {Foo}, [Foo]; prohibited (Foo), %FOO%), migration of existing code, documentation and test deliverables, and the leading .editorconfig (assets) mirrored into every repository. Load before producing C# code and use its agent checklist before returning code.
 metadata:
   version: "2026-10-21"
 ---
@@ -82,7 +82,7 @@ All source-code identifiers, comments, XML documentation, exception messages int
 ```csharp
 // Validate the configured endpoint before opening the connection.
 if (endpoint == null) {
-    throw new InvalidOperationException("The endpoint has not been configured.");
+  throw new InvalidOperationException("The endpoint has not been configured.");
 }
 ```
 
@@ -178,7 +178,7 @@ Prefer explicit validation when absence represents an exceptional or invalid sta
 
 ```csharp
 if (configuration == null) {
-    throw new InvalidOperationException("The configuration is required.");
+  throw new InvalidOperationException("The configuration is required.");
 }
 
 this.Configuration = configuration;
@@ -236,12 +236,12 @@ Abbreviated or expression-bodied properties SHOULD NOT be used.
 private String _Name;
 
 public String Name {
-    get {
-        return _Name;
-    }
-    set {
-        _Name = value;
-    }
+  get {
+    return _Name;
+  }
+  set {
+    _Name = value;
+  }
 }
 ```
 
@@ -276,7 +276,7 @@ Parameters and return values SHOULD additionally be documented where their seman
 /// <param name="customerId">The unique customer identifier.</param>
 /// <returns>The loaded customer.</returns>
 public Customer LoadCustomer(Int64 customerId) {
-    return _CustomerRepository.GetCustomer(customerId);
+  return _CustomerRepository.GetCustomer(customerId);
 }
 ```
 
@@ -315,7 +315,7 @@ All control-flow blocks MUST use braces, including single-line blocks.
 
 ```csharp
 if (customer == null) {
-    return;
+  return;
 }
 ```
 
@@ -323,7 +323,7 @@ Do not write:
 
 ```csharp
 if (customer == null)
-    return;
+  return;
 ```
 
 ### 9.2 Opening Braces
@@ -335,11 +335,11 @@ When a parenthesized list (parameters, arguments) is wrapped over several lines,
 ```csharp
 public class CustomerService {
 
-    public void ProcessCustomer(Customer customer) {
-        if (customer != null) {
-            this.ProcessCustomer(customer);
-        }
+  public void ProcessCustomer(Customer customer) {
+    if (customer != null) {
+      this.ProcessCustomer(customer);
     }
+  }
 
 }
 ```
@@ -349,7 +349,7 @@ Do not write:
 ```csharp
 if (customer != null)
 {
-    this.ProcessCustomer(customer);
+  this.ProcessCustomer(customer);
 }
 ```
 
@@ -359,9 +359,9 @@ if (customer != null)
 
 ```csharp
 if (customer != null) {
-    this.ProcessCustomer(customer);
+  this.ProcessCustomer(customer);
 } else {
-    this.ProcessMissingCustomer();
+  this.ProcessMissingCustomer();
 }
 ```
 
@@ -369,12 +369,12 @@ Exception handling follows the same style:
 
 ```csharp
 try {
-    this.ProcessCustomer(customer);
+  this.ProcessCustomer(customer);
 } catch (ExpectedCustomerException ex) {
-    DevLogger.LogError(ex);
-    throw;
+  DevLogger.LogError(ex);
+  throw;
 } finally {
-    this.ReleaseResources();
+  this.ReleaseResources();
 }
 ```
 
@@ -388,9 +388,9 @@ Prefer explicit branches.
 String displayName;
 
 if (customer.HasDisplayName) {
-    displayName = customer.DisplayName;
+  displayName = customer.DisplayName;
 } else {
-    displayName = customer.Name;
+  displayName = customer.Name;
 }
 ```
 
@@ -410,6 +410,12 @@ customers.Where(customer => customer.IsActive);
 
 Lambda expressions SHOULD remain simple. Complex behavior SHOULD be extracted into named methods.
 
+### 9.6 Indentation, Line Endings and Encoding
+
+- Indentation MUST use **two spaces** per level; no tabs. This applies to every example in this document.
+- Line endings are CRLF (the landscape is developed almost exclusively on Windows).
+- File encoding: UTF-8; **with BOM is preferred** on Windows, but not enforced - do not convert existing files only to add or remove a BOM. Exceptions where tools require no BOM (e.g. npm `package.json`) take precedence.
+
 ------
 
 ## 10. Collections and Method Signatures
@@ -418,7 +424,7 @@ When collections are transported through method or API signatures, arrays SHOULD
 
 ```csharp
 public Customer[] LoadCustomers() {
-    // ...
+  // ...
 }
 ```
 
@@ -426,7 +432,7 @@ Prefer:
 
 ```csharp
 public void ProcessCustomers(Customer[] customers) {
-    // ...
+  // ...
 }
 ```
 
@@ -434,7 +440,7 @@ over:
 
 ```csharp
 public void ProcessCustomers(List<Customer> customers) {
-    // ...
+  // ...
 }
 ```
 
@@ -495,10 +501,10 @@ Example:
 
 ```csharp
 try {
-    this.OpenConfigurationFile(fileName);
+  this.OpenConfigurationFile(fileName);
 } catch (FileNotFoundException ex) {
-    DevLogger.LogError(ex);
-    this.CreateDefaultConfiguration();
+  DevLogger.LogError(ex);
+  this.CreateDefaultConfiguration();
 }
 ```
 
@@ -701,65 +707,65 @@ The following example demonstrates several rules together.
 
 ```csharp
 public class CustomerService {
-    private readonly ICustomerRepository _CustomerRepository;
+  private readonly ICustomerRepository _CustomerRepository;
 
-    /// <summary>
-    /// Initializes a new customer service.
-    /// </summary>
-    /// <param name="customerRepository">The repository used for customer persistence.</param>
-    public CustomerService(ICustomerRepository customerRepository) {
-        if (customerRepository == null) {
-            throw new ArgumentNullException(nameof(customerRepository));
-        }
-
-        _CustomerRepository = customerRepository;
+  /// <summary>
+  /// Initializes a new customer service.
+  /// </summary>
+  /// <param name="customerRepository">The repository used for customer persistence.</param>
+  public CustomerService(ICustomerRepository customerRepository) {
+    if (customerRepository == null) {
+      throw new ArgumentNullException(nameof(customerRepository));
     }
 
-    /// <summary>
-    /// Loads all active customers.
-    /// </summary>
-    /// <returns>An array containing all active customers.</returns>
-    public Customer[] LoadActiveCustomers() {
-        DevLogger.LogTrace(0, 99999, "Loading active customers.");
+    _CustomerRepository = customerRepository;
+  }
 
-        Customer[] customers = _CustomerRepository.LoadCustomers();
-        List<Customer> activeCustomers = new List<Customer>();
+  /// <summary>
+  /// Loads all active customers.
+  /// </summary>
+  /// <returns>An array containing all active customers.</returns>
+  public Customer[] LoadActiveCustomers() {
+    DevLogger.LogTrace(0, 99999, "Loading active customers.");
 
-        foreach (Customer customer in customers) {
-            if (customer.IsActive) {
-                activeCustomers.Add(customer);
-            }
-        }
+    Customer[] customers = _CustomerRepository.LoadCustomers();
+    List<Customer> activeCustomers = new List<Customer>();
 
-        return activeCustomers.ToArray();
+    foreach (Customer customer in customers) {
+      if (customer.IsActive) {
+        activeCustomers.Add(customer);
+      }
     }
 
-    /// <summary>
-    /// Processes the specified customers.
-    /// </summary>
-    /// <param name="customers">The customers to process.</param>
-    public void ProcessCustomers(Customer[] customers) {
-        if (customers == null) {
-            throw new ArgumentNullException(nameof(customers));
-        }
+    return activeCustomers.ToArray();
+  }
 
-        foreach (Customer customer in customers) {
-            this.ProcessCustomer(customer);
-        }
+  /// <summary>
+  /// Processes the specified customers.
+  /// </summary>
+  /// <param name="customers">The customers to process.</param>
+  public void ProcessCustomers(Customer[] customers) {
+    if (customers == null) {
+      throw new ArgumentNullException(nameof(customers));
     }
 
-    /// <summary>
-    /// Processes a single customer.
-    /// </summary>
-    /// <param name="customer">The customer to process.</param>
-    private void ProcessCustomer(Customer customer) {
-        if (customer == null) {
-            throw new ArgumentNullException(nameof(customer));
-        }
-
-        customer.MarkAsProcessed();
-        _CustomerRepository.Save(customer);
+    foreach (Customer customer in customers) {
+      this.ProcessCustomer(customer);
     }
+  }
+
+  /// <summary>
+  /// Processes a single customer.
+  /// </summary>
+  /// <param name="customer">The customer to process.</param>
+  private void ProcessCustomer(Customer customer) {
+    if (customer == null) {
+      throw new ArgumentNullException(nameof(customer));
+    }
+
+    customer.MarkAsProcessed();
+    _CustomerRepository.Save(customer);
+  }
 }
 ```
 
@@ -788,6 +794,8 @@ This example intentionally favors explicit types, explicit control flow, arrays 
 | `else` / `catch` / `finally` | Same line after `}`                           | MUST                 |
 | Ternary expressions          | Avoid for normal control flow                 | MUST NOT             |
 | Lambda parameters            | Always parenthesized                          | MUST                 |
+| Indentation                  | Two spaces, no tabs; CRLF                     | MUST                 |
+| Encoding                     | UTF-8, BOM preferred, never mass-converted    | SHOULD               |
 | Collection signatures        | Prefer arrays                                 | SHOULD               |
 | Exception handling           | Catch only intentionally handled failures     | MUST                 |
 | Exception logging            | `DevLogger.LogError(ex)`                      | MUST when applicable |
@@ -816,6 +824,7 @@ Before returning generated C# code, the agent SHOULD verify at least the followi
 - opening brackets are at the end of the line (never on a line of their own) and continuation keywords follow the required layout;
 - ternary expressions were not introduced;
 - lambda parameters are parenthesized;
+- indentation uses two spaces;
 - collection boundaries use arrays where appropriate;
 - nullable states are intentional;
 - exception handling is purposeful;
@@ -895,6 +904,15 @@ New knowledge SHOULD normally extend or refine the existing document rather than
 
 If a rule changes, the normative rule, affected examples, requirements summary, and AI-agent guidance SHOULD be updated consistently.
 
+### 23.1 Leading `.editorconfig`
+
+The agreed tool configuration (IDE / analyzer settings, formatting, naming rules) is maintained as the leading [assets/.editorconfig](assets/.editorconfig) (agreed state 2026-10-21; change it only by explicit decision).
+
+- Every repository carries an **identical mirror** of it in the repository root (see `smart-solution-and-project-structure`); the header marks it as a mirror with its version. Never edit a mirror; change the leading version here, raise its `Version` line and refresh the mirrors.
+- Repository-specific deviations go into a nested `.editorconfig` (without `root = true`) next to the affected code, with a comment stating the reason.
+- The `.editorconfig` does not encode every rule of this document, and some of its preferences are more permissive (mostly `silent`). For writing code, this document remains binding; IDE suggestions or code fixes that contradict it (e.g. auto-properties, conditional expressions, expression-bodied members, primary constructors) are not applied. Known differences are listed in section 24.
+- When a rule of this document changes and is tool-enforceable, propose the matching `.editorconfig` change in the same step.
+
 ------
 
 ## 24. Open Refinement Areas
@@ -912,6 +930,12 @@ The following areas are intentionally left for iterative refinement:
 - event and delegate conventions;
 - reflection and runtime code-generation rules;
 - project-specific logging identifiers beyond the generic trace defaults;
-- additional rules for public API compatibility.
+- additional rules for public API compatibility;
+- alignment between this document and the agreed `.editorconfig` (section 23.1). Differences found 2026-10-21:
+  - constants: the `.editorconfig` requires PascalCase **without** `_` (`error`), section 6.2 requires `_` + PascalCase; fields with `_` apply to all accessibilities there, not only private ones;
+  - type names: the `.editorconfig` prefers language keywords (`string`, `int`), the examples here use BCL names (`String`, `Int32`) without a stated rule;
+  - `var` is not covered by the `.editorconfig` (section 5.1 forbids it);
+  - auto-properties, conditional expressions, `??` / `?.`, expression-bodied properties / accessors, top-level statements, primary constructors and collection expressions are preferred there (mostly `silent`, some `suggestion`) but restricted by sections 5.3, 7, 9.4 and 4.4;
+  - additional rules of the `.editorconfig` not described here yet: namespace must match the folder (IDE0130, `error`), parentheses for clarity in binary operators, explicit accessibility modifiers, `this.` for methods and properties as `error`, camelCase parameters and locals, line guideline at 120 characters.
 
 Until explicitly refined, these areas MUST be approached conservatively according to the principles in Sections 1 through 4.

@@ -218,6 +218,8 @@ Assume mature reference systems may contain design debt, compatibility layers, t
 
 10. Review the result for unnecessary code, duplicate standards, accidental coupling and non-uniform behavior.
 
+For an existing solution that is to be brought "up to date" (target frameworks, project files, packages, nuspec files, bootstrap, repository conventions), follow the standardized procedure in `refactoring-processes` instead.
+
 # 18. Desired Agent Behavior
 
 A capable agent working under this master skill should behave like an architect-composer rather than a framework collector. It should prefer established puzzle pieces, understand them deeply, connect them through their intended seams, and resist adding code until a real product-specific need remains.

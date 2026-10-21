@@ -45,7 +45,7 @@ Formatting: two-space XML indentation, blank lines between conceptual sections, 
 
 ## 3. Identity and Metadata
 
-- The project file base name (without `.csproj`) equals `AssemblyName`, `PackageId` and normally `Description`.
+- The project file base name (without `.csproj`) equals `AssemblyName`, `PackageId` and normally `Description` - except for the target-framework suffix of side-by-side variants (`Example.Contract.net8.0.csproj` builds `Example.Contract`; see `refactoring-processes`).
 - `Title` may be a distinct user-facing application title.
 - `Product`, `RootNamespace` and `SourceContext` are intentionally simpler than the full assembly identity, often derived from the first meaningful product / namespace token. The exact universal derivation is not settled yet; ask if ambiguous.
 - Preserve existing meaningful `Company`, `Copyright`, `Authors`, `Version`, `AssemblyVersion`, `FileVersion`. Never replace them with empty values or reset versions.
@@ -403,6 +403,8 @@ The GUID is illustrative, not a required value. Preserve custom MSBuild targets 
 8. Propose uncertain `ProjectReference` variants; never rewrite silently.
 9. Validate XML / MSBuild evaluation / build when tooling is available.
 10. Review a minimal Git diff and report unresolved decisions.
+
+When project files are normalized as part of bringing a whole solution up to date (including target framework changes and renaming of suffixed project files), follow `refactoring-processes`.
 
 ## 10. Open Issues
 
