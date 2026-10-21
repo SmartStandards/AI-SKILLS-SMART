@@ -2,7 +2,7 @@
 name: smart-standards-library-ecosystem
 description: Index and routing authority for the SmartStandards / UShell open-source library landscape (incl. admitted KornSW repositories) - which repositories exist, their GitHub owner and clone URL, local folder name, role, problem domain, own upstream skills, matching snapshot skill, and which repositories are excluded (legacy, proof of concept, private). Use when an unknown open-source package, repository or component appears; when looking for the repository, clone URL or skills of a library such as FUSE-fx, UJMW, SmartAmbience, ComponentDiscovery, AuthTokenHandling, KVU, UniversalBFF or UShell; before writing helper or cross-cutting code that a library of this landscape may already own; or when asked about the role or successor of a library.
 metadata:
-  version: "2026-10-19"
+  version: "2026-10-19b"
 ---
 
 # SmartStandards Library Ecosystem (Index)
@@ -107,10 +107,10 @@ Keep rows short. "Local folder" is only filled where developers commonly use a f
 
 | Repository | Local folder | Role (short) | Upstream skills | Snapshot | Note |
 | --- | --- | --- | --- | --- | --- |
-| `UShell.Docs` | | Central UShell documentation and skills; consolidation repository of the UShell layer. | `ushell-architecture` (mandatory root entry), `ushell-*` (11 more) | - | |
-| `UShell.ReactFrontend` | | Productive leading React runtime of UShell. | `ushell`, `most-important-details-for-ushell-react-frontend` | - | |
-| `UShell.CommonComponents.JS` | | Generic reusable components / widgets (npm `ushell-common-components`). | `most-important-details-for-ushell-common-components-js` | - | |
-| `UShell.ModuleBase.JS` | | JS/TS module and widget integration contract. | `most-important-details-for-ushell-module-base-js` | - | |
+| `UShell.Docs` | | Central UShell documentation and skills; consolidation repository of the UShell layer. | `ushell-architecture` (mandatory root entry), `ushell-*` (12 more, incl. `ushell-design-debt`) | - | Verified 2026-10-19. |
+| `UShell.ReactFrontend` | | Productive leading React runtime of UShell. | `ushell-frontend-development` | - | Verified 2026-10-19. |
+| `UShell.CommonComponents.JS` | | Generic reusable components / widgets (npm `ushell-common-components`). | `ushell-common-components-development` | - | Verified 2026-10-19. |
+| `UShell.ModuleBase.JS` | | JS/TS module and widget integration contract. | `ushell-modulebase-development` | - | Verified 2026-10-19. |
 | `UShell.PortfolioDescription` | | Portfolio / module / workspace / use-case description contract. | `most-important-details-for-ushell-portfolio-description` | - | |
 | `UShell.ServerCommands.Contract` | | Server-side command contract and ASP.NET Core integration. | `most-important-details-for-ushell-server-commands-contract` | - | |
 | `UShell.DemoApp` | | Sample module / demo application. | `most-important-details-for-ushell-demo-app` | - | |
