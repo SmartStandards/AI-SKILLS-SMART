@@ -26,7 +26,7 @@ Core invariants:
 - `AspWebApiRuntimeInitializer` only if originally used; `OnApplicationReady(app)` is then the last statement.
 - Migration never changes semantics, order, variable names or security-relevant configuration on its own; ask instead of guessing.
 
-`LaunchProfileHelper` and `AddBranchSpecificConfigurationFiles()` are described in the snapshot skill `smart-solution-and-project-structure`.
+`LaunchProfileHelper` and `AddBranchSpecificConfigurationFiles()` are described in the snapshot skill `smart-solution-and-project-structure`, together with the designed state of `launchSettings.json` and the appsettings files (`Launch Profile and Configuration Design`).
 
 When the bootstrap is reviewed as part of bringing a whole solution up to date, follow the procedure in `refactoring-processes` (analysis and plan first, migration only after confirmation).
 

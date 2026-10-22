@@ -10,7 +10,7 @@ How snapshot skills are built, refreshed and retired is defined in [smart-skill-
 
 | Skill | Problem domain | Upstream repositories | Snapshot date |
 | --- | --- | --- | --- |
-| [smart-skill-maintaining-guidelines](.agents/skills/smart-skill-maintaining-guidelines/SKILL.md) | Rules of this repository (not a snapshot) | - | 2026-10-19 |
+| [smart-skill-maintaining-guidelines](.agents/skills/smart-skill-maintaining-guidelines/SKILL.md) | Rules of this repository (not a snapshot), incl. the recurring instruction scope cleanup | - | 2026-10-22 |
 | [smart-standards-library-ecosystem](.agents/skills/smart-standards-library-ecosystem/SKILL.md) | Index of all repositories of the landscape (not a snapshot, not copied) | all | - |
 | [include-additional-mandatory-skills](.agents/skills/include-additional-mandatory-skills/SKILL.md) | Template skill (leading source here, may be duplicated) | - | - |
 | [master-architect](.agents/skills/master-architect/SKILL.md) | General skill: capability-first architecture and wire-up reasoning (not a snapshot) | - | - |

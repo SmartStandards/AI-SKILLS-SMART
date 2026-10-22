@@ -1,6 +1,6 @@
 ---
 name: refactoring-processes
-description: Standardized high-level refactoring processes for existing .NET solutions of the SmartStandards / UShell landscape - analyze first, present a plan, execute only after confirmation, never commit. Currently - bringing a solution "up to date" ("auf den aktuellen Stand bringen", modernize): package versions (package-version-preferences-dot-net), target frameworks (Web APIs net10.0 only; contracts net4x + net8.0 + net10.0, no net6.0) incl. project renames and .sln re-wiring, project files (dotnet-sdk-style-project-files), .nuspec files (dist paths, KVU pre-processor configuration, versioningTwins), ASP.NET Core bootstrap review (asp-net-core-development-guidelines), repository and /doc layout (smart-solution-and-project-structure: README, LICENSE, AGENTS.md, ecosystem.md, epics, work) - no breaking renames of assembly names or namespaces; deviations go to doc/work/tech-debt.md. Load when a user asks to bring a solution, repository or project up to date, or for another larger structural refactoring.
+description: Standardized high-level refactoring processes for existing .NET solutions of the SmartStandards / UShell landscape - analyze first, present a plan, execute only after confirmation, never commit. Currently - bringing a solution "up to date" ("auf den aktuellen Stand bringen", modernize): package versions (package-version-preferences-dot-net), target frameworks (Web APIs net10.0 only; contracts net4x + net8.0 + net10.0, no net6.0) incl. project renames and .sln re-wiring, project files (dotnet-sdk-style-project-files), .nuspec files (dist paths, KVU pre-processor configuration, versioningTwins), ASP.NET Core bootstrap review (asp-net-core-development-guidelines), launch profile clean-up (Development / Infra, profile name = environment name, no IIS Express or branch names; smart-solution-and-project-structure), repository and /doc layout (smart-solution-and-project-structure: README, LICENSE, AGENTS.md, ecosystem.md, epics, work) - no breaking renames of assembly names or namespaces; deviations go to doc/work/tech-debt.md. Load when a user asks to bring a solution, repository or project up to date, or for another larger structural refactoring.
 metadata:
   version: "2026-10-21"
 ---
@@ -111,6 +111,14 @@ The authoritative implementation is KVU (`VersioningUtil`, see `smart-standards-
 
 For every web host, review `Program.cs` / `Startup.cs` against `asp-net-core-development-guidelines` and its `references/application-bootstrap.md` (canonical `Program.Main`, the two hooks, `UseAmbientFieldAdapterMiddleware` first, no static configuration) and the launch-profile handling of `smart-solution-and-project-structure`. A migration into the designed state is a separate plan item with its own confirmation; follow the migration rules of that reference.
 
+**Launch profiles and configuration files.** For every web host, compare `Properties/launchSettings.json` and the `appsettings*.json` files with section `Launch Profile and Configuration Design` of `smart-solution-and-project-structure` (profiles `Development` and `Infra`, optional `Infra-<Qualifier>`; profile name = environment name; no IIS Express, project-named or branch-named profiles; no local connection strings in `appsettings.json`). The clean-up is one plan item per host, risk `needs decision`, because renaming an environment changes which files and code paths are active. The plan item lists:
+
+- profiles to remove (IIS Express, `iisSettings`, project-named profiles), to rename and to add; the existing ports are kept; which old profile becomes `Development` and which `Infra` is decided by the user when it is not evident from the connection strings;
+- appsettings files to rename along with their environment (e.g. `appsettings.Dev.json` -> `appsettings.Development.json`, values for the shared infrastructure -> `appsettings.Infra.json`), with the split of their values where one file served both scenarios; branch-dependent values found in profile or environment files are proposed as `appsettings.<Branch>.json` entries;
+- local connection strings in `appsettings.json` to move into `appsettings.Development.json` / `appsettings.Infra.json` - only after the user has confirmed that deployment does not rely on them;
+- code depending on environment names (`IsDevelopment()`, `IsEnvironment(...)`, `IsProduction()`, string comparisons with environment names), especially `IsDevelopment()` checks whose behavior is also needed with `Infra` (e.g. Swagger) and checks for removed environment names; each one is reported with a proposal (e.g. an explicit setting), never silently rewritten (rule 6);
+- every reference to old profile names or `LaunchProfile=<index>` arguments in launcher configurations, scripts, pipelines, `/doc` and the project skill.
+
 ### E. Repository Conventions
 
 Check conformance with `smart-solution-and-project-structure` and the conventions visible in comparable repositories of the landscape (e.g. `dotnet\` with solution, `.nuspec` files, `src\`, `test\`, `dist\`).
@@ -161,6 +169,7 @@ Then stop and wait for confirmation.
 - [ ] `/doc`: no numeric prefixes, no `README.*`, `ecosystem.md`, `decisions/`, `epics/`, `work/backlog.md`, `work/tech-debt.md`.
 - [ ] `.nuspec` paths match `dist\<tfm>\`; exactly one KVU comment in every `.nuspec` (at least `"KVU": { }`), no braces in other comments; `versioningTwins` = same-repository siblings; sources resolve.
 - [ ] Bootstrap reviewed; migration only if confirmed.
+- [ ] Launch profiles: `Development` + `Infra` (+ `Infra-<Qualifier>`), profile name = environment name, no IIS Express / project / branch names, ports kept; appsettings files renamed along; no local connection strings in `appsettings.json` (if confirmed); environment-name checks reported; launcher / script references updated.
 - [ ] No unconfirmed package changes; no coding-rules sweep.
 - [ ] `changelog.md` changed at most below `## Upcoming Changes`; consumer-visible changes reported with a proposed commit prefix or entry.
 - [ ] Build result reported honestly; nothing committed.

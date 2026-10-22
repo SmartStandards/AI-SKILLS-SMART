@@ -1,6 +1,6 @@
 ---
 name: smart-solution-and-project-structure
-description: Common repository conventions and the ASP.NET Core hosting template of the SmartStandards landscape - the repository layout of standalone solutions (root README, LICENSE, AGENTS.md, CLAUDE.md, .editorconfig mirror, .agents/skills, /doc with requirements, architecture, quickstart, ecosystem.md, decisions/, epics/, work/backlog.md and tech-debt.md, changelog.md) and the SmartStandards.AspNetCoreTemplate / SmartStandards.WebApiDependencies startup pattern (Program.Main, LaunchProfileHelper with "LaunchProfile=<name>", branch-specific appsettings files, SmartStandardsCheapInitializer). Use when writing or debugging Program.Main of a SmartStandards-style ASP.NET Core Web API, when a service behaves differently started from Visual Studio vs. as EXE (e.g. falls back to port 5000), or when appsettings.<Branch>.json files are involved. Snapshot of the upstream skills; escalate to the upstream repositories for library development or deep troubleshooting.
+description: Common repository conventions and the ASP.NET Core hosting template of the SmartStandards landscape - the repository layout of standalone solutions (root README, LICENSE, AGENTS.md, CLAUDE.md, .editorconfig mirror, .agents/skills, /doc with requirements, architecture, quickstart, ecosystem.md, decisions/, epics/, work/backlog.md and tech-debt.md, changelog.md) and the SmartStandards.AspNetCoreTemplate / SmartStandards.WebApiDependencies startup pattern (Program.Main, LaunchProfileHelper with "LaunchProfile=<name>", branch-specific appsettings files, SmartStandardsCheapInitializer), plus the launch profile design (profiles Development, Infra, Infra-<Qualifier>; profile name = environment name; no IIS Express, project-named or branch-named profiles; no local connection strings in appsettings.json). Use when writing or debugging Program.Main of a SmartStandards-style ASP.NET Core Web API, when creating or cleaning up launchSettings.json, when a service behaves differently started from Visual Studio vs. as EXE (e.g. falls back to port 5000), or when appsettings.<Branch>.json files are involved. Snapshot of the upstream skills; escalate to the upstream repositories for library development or deep troubleshooting.
 metadata:
   snapshot-date: "2026-10-19"
 ---
@@ -9,10 +9,10 @@ metadata:
 
 <!-- Layer 1 - Domain Overview -->
 
-How SmartStandards repositories and hosts are structured and started. This skill covers the repository and documentation layout of standalone solutions (a landscape convention, see `Repository Layout of Standalone Solutions`) and the ASP.NET Core hosting template. Further conventions of the domain (shared projects, multi-targeting) are not yet covered here - read the `most-important-details-for-*` skill of the respective repository.
+How SmartStandards repositories and hosts are structured and started. This skill covers the repository and documentation layout of standalone solutions (a landscape convention, see `Repository Layout of Standalone Solutions`), the ASP.NET Core hosting template and the design of launch profiles and configuration files (a landscape convention, see `Launch Profile and Configuration Design`). Further conventions of the domain (shared projects, multi-targeting) are not yet covered here - read the `most-important-details-for-*` skill of the respective repository.
 
 - Libraries / repositories in scope: `AspNetCoreTemplate` (package `SmartStandards.WebApiDependencies`)
-- Use for: creating or reviewing the root files and the `/doc` folder of a repository, `Program.Main` of a SmartStandards-style Web API, launch profiles for directly started EXEs, branch-specific configuration files
+- Use for: creating or reviewing the root files and the `/doc` folder of a repository, `Program.Main` of a SmartStandards-style Web API, launch profiles for directly started EXEs, the designed state of `launchSettings.json` and the appsettings files, branch-specific configuration files
 - Out of scope: UJMW, SmartAmbience and logging internals (only wired by the template) - see `smart-http-remoting-standard`, `smart-dataflow-and-ambience`; versioning - see `nuget-semantic-versioning-kvu`
 - Bringing a whole solution up to date (target frameworks, renames, nuspec, conformance check against this skill): follow the general skill `refactoring-processes`
 
@@ -70,6 +70,66 @@ if (launchProfileHelper.TryGetUrlsFromLaunchProfile(explicitLaunchProfile, out s
 | Throws although `throwIfNotFound: false` | Known defect in 10.0.14 (internal lookup throws) | Fix upstream; do not work around in consuming code |
 | Environment variable / CLI override seems ignored | A branch file overrides it | Look for `appsettings.<Branch>.json` in the checkout |
 | Branch file not applied | Branch name contains `/`, detached HEAD, or no Git | `git rev-parse --abbrev-ref HEAD` |
+| With profile `Infra`: Swagger, user secrets, developer exception page or static web assets missing (present with `Development`) | Code or framework defaults depend on the environment name `Development` | Search for `IsDevelopment()`, `IsEnvironment(`, `IsProduction()`; see `Launch Profile and Configuration Design` |
+
+## Launch Profile and Configuration Design
+
+Landscape convention (user decision 2026-10-21), not a snapshot of an upstream repository; it applies to every SmartStandards-style ASP.NET Core host and is part of bringing a solution up to date (`refactoring-processes`, aspect D).
+
+### Two Scenarios, Two Profiles
+
+Local development knows only two scenarios. Branch-dependent differences are not a scenario; they live in the branch-specific files.
+
+| Profile | `ASPNETCORE_ENVIRONMENT` | Purpose |
+| --- | --- | --- |
+| `Development` | `Development` | Fully local development against local databases and services. Deliberately the ASP.NET Core standard name, so that the framework defaults bound to it (`IsDevelopment()`, automatic user secrets, DI validation, static web assets, template code such as Swagger in development) apply without extra code. |
+| `Infra` | `Infra` | Local development against an already deployed, shared development or integration infrastructure. The deployed state **must match the current code state**. Never meant for production. |
+| `Infra-<Qualifier>` | `Infra-<Qualifier>` | Optional, one per further infrastructure installation (e.g. a separate silo or client group), only if its granularity is not already covered by the branches. |
+
+`Development` and `Infra` are the minimum standard of every Web API host. `Development` names the scenario "fully local", not a branch or a deployment stage.
+
+### Rules for `Properties/launchSettings.json`
+
+- **Profile name = environment name**, exactly. The profile `Infra` sets `ASPNETCORE_ENVIRONMENT` to `Infra` and therefore selects `appsettings.Infra.json`; no mapping table is needed.
+- **Only `commandName: "Project"` profiles.** No IIS Express profile, no `iisSettings` block, no profiles named after the project or service (e.g. `DemoWebService`). Other launch targets (Docker, WSL) only when the solution really uses them - ask.
+- **No branch words** in profile or environment names: no `Develop`, `Dev`, `Main`, `Master`, `Release`, `Feature`, or similar (`Development` is the scenario name above, not a branch). Branch-dependent settings go into `appsettings.<Branch>.json` / `appsettings.<Environment>.<Branch>.json`.
+- **Order:** `Development` first (default for `dotnet run` and fresh checkouts), then `Infra`, then `Infra-<Qualifier>` profiles.
+- **URLs:** keep the existing ports of the service; all profiles of a service normally use the same `applicationUrl`.
+- **`environmentVariables`** contains only `ASPNETCORE_ENVIRONMENT`. Further variables are ignored by `LaunchProfileHelper` (see `Core Concepts`) and would make a Visual Studio start differ from an EXE start; put such values into the appsettings files. `launchBrowser` / `launchUrl` are allowed (Visual Studio only).
+- **Starting the EXE outside Visual Studio** (launcher tools, scripts): pass `LaunchProfile=<name>` by name, not by index, so reordering profiles cannot switch the environment.
+
+```json
+{
+  "profiles": {
+    "Development": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:44301;http://localhost:44300",
+      "environmentVariables": { "ASPNETCORE_ENVIRONMENT": "Development" }
+    },
+    "Infra": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "applicationUrl": "https://localhost:44301;http://localhost:44300",
+      "environmentVariables": { "ASPNETCORE_ENVIRONMENT": "Infra" }
+    }
+  }
+}
+```
+
+### Configuration Files
+
+| File | Content |
+| --- | --- |
+| `appsettings.json` | Base configuration for deployment. **No local connection strings**: if a connection string is missing during development, startup must fail instead of silently using a deployment value. |
+| `appsettings.Development.json` / `appsettings.Infra.json` / `appsettings.Infra-<Qualifier>.json` | Values of the scenario, e.g. local database connections vs. endpoints of the shared infrastructure. |
+| `appsettings.<Branch>.json` / `appsettings.<Environment>.<Branch>.json` | Optional, branch-dependent values (e.g. one database per branch); override everything above (see `Core Concepts`). Preferred over additional profiles. |
+
+- Add a further `Infra-<Qualifier>` profile only when a different infrastructure must be addressed whose granularity is not already covered by the branches.
+- Deployed hosts are not configured via launch profiles; the hosting environment (e.g. `web.config`, environment variables) sets the environment, and branch files are not applied without Git.
+- `IsDevelopment()` is `true` only for `Development`; with `Infra` / `Infra-<Qualifier>` it is `false`, so the framework defaults bound to `Development` are off there. Do not add more `IsDevelopment()` checks for behavior that is also needed with `Infra` (e.g. Swagger, diagnostics); switch it via explicit settings (e.g. `ProdMode` of `SmartStandardsCheapInitializer`) instead of further environment names.
 
 ## Repository Layout of Standalone Solutions
 

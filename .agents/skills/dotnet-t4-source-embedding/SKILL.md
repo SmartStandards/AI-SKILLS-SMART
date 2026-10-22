@@ -86,6 +86,8 @@ Mehrere DLLs mit derselben eingebetteten Implementierung können gemeinsam laufe
   | Platzhalter (Konvention: `TemplateNamespace`) | **Absorb** | `<hint>[.Sub]`: der Code wird Teil des Verwender-Namespace |
 
   Beide sind pro Projekt eindeutig. „Absorb“ ist für Vorlagen-Code gedacht, der beim Verwender „wohnen“ soll.
+
+  **Mehrere Namespace-Roots.** Der Rewrite erfasst nur `originRootNamespace`. Enthält die Quelle weitere Roots, bleiben diese unverändert und sind damit nicht pro Projekt eindeutig. Typisch sind Extension-Klassen in `Microsoft.AspNetCore.Builder` oder `Microsoft.Extensions.DependencyInjection`. Als `originRootNamespace` wählst du den Root mit den Implementierungstypen. Den unveränderten Rest meldest du dem User und lässt ihn entscheiden: akzeptieren (z. B. in Exe- oder Testprojekten, die nie gemergt werden) oder upstream so umbauen, dass alles unter einem Root liegt.
 - **Sichtbarkeit.** Alle `public`-Typen werden `internal`.
 - **`partial`.** Klassen, Structs, Interfaces und Records werden `partial`, damit Verwender sie lokal erweitern können.
 
@@ -175,9 +177,10 @@ Die generierte `.cs` wird **eingecheckt**. Sie ist der Snapshot.
 2. In der generierten `.cs` darf es keinen `public`-Typ auf Namespace-Ebene geben.
    - Bei der Strategie CopyFor enthalten alle Namespaces `.CopyFor<...>`.
    - Bei der Strategie Absorb taucht kein `TemplateNamespace` mehr auf.
-   - Jedes `using` ist im Zielprojekt auflösbar.
+   - Jedes `using` ist im Zielprojekt auflösbar, und zwar über eine eigene, gewollte Referenz. Ein `using`, das nur zufällig über eine transitive Abhängigkeit auflöst (z. B. `Microsoft.CodeAnalysis` via EF Core Design), meldest du dem User als Origin-Befund.
 3. Keine `#error`-Zeile im Output.
-4. `git diff` der `.cs` lesen. Unerwartete Änderungen meldest du dem User, bevor du committest.
+4. Im `.tt` steht kein `<…>`-Platzhalter, kein fremdes Beispiel und kein Kommentar aus dem Skelett oder einem anderen Template, der nicht auf diesen Snapshot zutrifft.
+5. `git diff` der `.cs` lesen. Unerwartete Änderungen meldest du dem User, bevor du committest.
 
 ## Update
 
@@ -189,7 +192,8 @@ Die generierte `.cs` wird **eingecheckt**. Sie ist der Snapshot.
 ## Anforderungen an die Origin-Quellen (Hinweise für Library-Autoren)
 
 - **Block-scoped Namespaces** (`namespace X {`). File-scoped Namespaces (`namespace X;`) gehen nicht, weil nach der Aggregation nur einer pro Datei erlaubt ist.
-- **Vollständige `using`s pro Datei**, keine Abhängigkeit von `ImplicitUsings` oder `global using`.
+- **Vollständige `using`s pro Datei**, keine Abhängigkeit von `ImplicitUsings` oder `global using`. Ungenutzte `using`s entfernen: Jedes `using` wird zur Abhängigkeit jedes Verwenders.
+- **Kopfkommentare passend zur Datei.** Stammt die Datei selbst aus einem anderen Snapshot, werden dessen Header und Typnamen beim Übernehmen angepasst. Sonst trägt jeder Output widersprüchliche Herkunftsangaben.
 - **Keine voll qualifizierten Selbstreferenzen** (`Origin.Root.Foo.Bar()`). Der Namespace-Rewrite erfasst nur `namespace`- und `using`-Zeilen.
 - **Nicht einzubettender Code** steht in `#if !UsedByT4 … #else … #endif`. Der `#if`-Teil fällt weg, der `#else`-Teil bleibt. Keine Verschachtelung.
 - **`[assembly: …]`-Zeilen** werden verworfen.
@@ -199,6 +203,11 @@ Die generierte `.cs` wird **eingecheckt**. Sie ist der Snapshot.
 ## Template-Skelett
 
 Nur verwenden, wenn das Origin-Repo kein eigenes `.tt` liefert. Der Konfigurationsblock wird angepasst, der Rest bleibt unverändert.
+
+Beim Anpassen des Konfigurationsblocks gilt:
+- Jeden `<…>`-Platzhalter ersetzen. Kommentierte Beispiele, die nicht zutreffen, löschen. Bleibt z. B. `extraNamespaceRewrites` leer, bleibt es ohne Beispielzeile.
+- Den Zweck-Kommentar neu schreiben, passend zu genau diesem Snapshot. Nie Kopfkommentare aus anderen Templates übernehmen, etwa aus dem Logging-Template unter `references/`.
+- Mehrzeilige Kommentare mit echten Zeilenumbrüchen schreiben, jede Zeile mit eigenem `//`. Keine Escape-Sequenzen wie `\r\n` im Kommentar.
 
 ```csharp
 <#@ template debug="false" hostspecific="true" language="C#" #>
@@ -236,7 +245,7 @@ bool absorbIntoConsumerNamespace = false;
 // Optional: usings pointing to OTHER embedded snapshots (their namespace is CopyFor-rewritten as well).
 // Key = namespace as written in the origin source, value = namespace in the consumer project.
 var extraNamespaceRewrites = new Dictionary<string, string> {
-  // { "Logging.SmartStandards", "Logging.SmartStandards.CopyFor<Consumer>" },
+  // { "<Other.Origin.Root>", "<Other.Origin.Root>.CopyFor<Consumer>" },
 };
 
 string headerNote = "Partial copy of <Library>. <Reduced features / limitations>.";
@@ -356,3 +365,4 @@ try {
 - Ein vorhandenes kanonisches Origin-`.tt` lokal „optimieren“, statt die Änderung upstream zu machen.
 - Eine Komposition (Variante C) ohne kanonisches Origin-`.tt` und ohne `ttVersionCheck` einbetten.
 - Eine Komposition als „Klon“ einstufen, um sich die Origin-Pflege zu sparen.
+- Skelett-Platzhalter, kommentierte Beispiele oder Kommentare aus einem anderen Template (z. B. Logging) stehen lassen, obwohl sie für diesen Snapshot nicht gelten.

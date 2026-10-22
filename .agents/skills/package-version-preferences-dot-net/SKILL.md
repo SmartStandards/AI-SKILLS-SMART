@@ -2,7 +2,7 @@
 name: package-version-preferences-dot-net
 description: Preferred version ranges of well-known .NET NuGet packages (legacy lower bound and medium-term upper bound), pinned versions with their reasons (e.g. MSTest 3.11.1), the status of competing technologies (preferred / tolerated / banned, e.g. Newtonsoft.Json preferred, System.Text.Json tolerated) and the reference solutions that represent the leading versions (AspNetCoreTemplate = state of the art, UniversalBFF = bleeding edge). Load before adding, updating, downgrading or choosing a NuGet package or test framework, when a package version looks unusual, or when choosing between competing libraries. Includes a cyclic review rule and the duty to actively question grossly outdated or much too new packages with the user.
 metadata:
-  version: "2026-10-21"
+  version: "2026-10-22"
 ---
 
 # Package Version Preferences (.NET)
@@ -48,6 +48,7 @@ SmartStandards / UShell / KornSW packages of the landscape (e.g. `UJMW.*`, `Smar
 | Concern | Preferred (state of the art) | Tolerated | Banned | Note |
 | --- | --- | --- | --- | --- |
 | JSON serialization | `Newtonsoft.Json` | `System.Text.Json` | - | Do not introduce `System.Text.Json` without a concrete technical requirement; do not mix both in one project without a strong reason (see `csharp-coding-standards`, section 15). |
+| Unit test framework | `MSTest` | ? | ? | Use MSTest for unit test projects; version pin see section 2. |
 
 Status meaning:
 
