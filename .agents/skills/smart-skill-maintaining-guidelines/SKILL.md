@@ -1,8 +1,8 @@
 ---
 name: smart-skill-maintaining-guidelines
-description: MANDATORY and AUTHORITATIVE for ALL work inside this repository (AI-SKILLS-SMART) - load FIRST, before creating, editing, reviewing, refreshing, renaming or deleting any skill here. Defines how this repository consolidates the official, public SmartStandards and UShell open-source landscape (incl. selected public KornSW repositories) into snapshot skills - compact buffer skills per problem domain with cached essentials, a snapshot date with staleness alarm logic, and an escalation edge pointing to the upstream Git repositories and their own skills - and how new knowledge is written back into the upstream problem-domain repositories and their full-version skills. Also load whenever a snapshot skill from this repository is consumed and its age, its staleness alarm, or the decision to escalate to the upstream repository is in question.
+description: MANDATORY and AUTHORITATIVE for ALL work inside this repository (AI-SKILLS-SMART) - load FIRST, before creating, editing, reviewing, refreshing, renaming or deleting any skill here. Defines how the official, public SmartStandards and UShell open-source landscape is consolidated into snapshot skills (cached essentials, snapshot date with staleness alarm, escalation edge to the upstream repositories and their skills) and how new knowledge is written back upstream. Also load when a snapshot's age, staleness alarm or escalation is in question, and for the recurring local instruction scope cleanup - scanning repository- and user-level agent instruction files (Copilot, Claude, AGENTS.md, Cursor, ...) for misplaced general rules and moving them into skills.
 metadata:
-  snapshot-date: "2026-10-19"
+  snapshot-date: "2026-10-22"
 ---
 
 # Skill Maintaining Guidelines (AI-SKILLS-SMART)
@@ -192,6 +192,14 @@ Work in this repository may produce new knowledge about a problem domain (e.g. f
 ### Retire
 
 Remove or merge a snapshot skill when its domain is discontinued or absorbed into another domain. Update the `README.md` index and the references in neighboring skills.
+
+## Instruction Scope Cleanup (recurring, local)
+
+Agent products persist preferences with poor scoping (GitHub Copilot offers only repository level, with user level as an emergency switch). General rules therefore accumulate in repository- and user-level instruction files of all harnesses. A recurring, local process collects them: scan the repositories in the Git roots and the known user-level locations, build an index of statements with a scope test ("does the scope make sense?" - e.g. detailed usage rules for a framework the repository only consumes via NuGet indicate a general rule), then ask the user clearly per group whether the knowledge is generally valid, into which skill or collection (this repository, upstream, an organization-owned collection) it moves, and whether the original is deleted, replaced by a pointer or marked as redundant. Nothing is moved or deleted before that decision.
+
+User level keeps only personal preferences (language, tone, local tooling, routing reference); repository level keeps only a routing line and facts true for that repository alone.
+
+Full procedure, scan locations, index format and redundancy marker: [references/instruction-scope-cleanup.md](references/instruction-scope-cleanup.md). The index of a run contains non-public content and is never committed here.
 
 ## Review Checklist (before delivering a change)
 

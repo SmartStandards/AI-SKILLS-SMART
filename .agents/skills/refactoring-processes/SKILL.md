@@ -1,8 +1,8 @@
 ---
 name: refactoring-processes
-description: Standardized high-level refactoring processes for existing .NET solutions of the SmartStandards / UShell landscape - analyze first, present a plan, execute only after confirmation, never commit. Currently - bringing a solution "up to date" ("auf den aktuellen Stand bringen", modernize): package versions (package-version-preferences-dot-net), target frameworks (Web APIs net10.0 only; contracts net4x + net8.0 + net10.0, no net6.0) incl. project renames and .sln re-wiring, project files (dotnet-sdk-style-project-files), .nuspec files (dist paths, KVU pre-processor configuration, versioningTwins), ASP.NET Core bootstrap review (asp-net-core-development-guidelines), repository and /doc layout (smart-solution-and-project-structure: README, LICENSE, AGENTS.md, ecosystem.md, epics, work) - no breaking renames of assembly names or namespaces; deviations go to doc/work/tech-debt.md. Load when a user asks to bring a solution, repository or project up to date, or for another larger structural refactoring.
+description: Standardized high-level refactoring processes for existing .NET solutions of the SmartStandards / UShell landscape - analyze first, present a plan, execute only after confirmation, never commit. Currently - bringing a solution "up to date" ("auf den aktuellen Stand bringen", modernize): package versions, target frameworks (Web APIs net10.0 only; contracts net4x + net8.0 + net10.0, no net6.0) incl. project renames and .sln re-wiring, project files, .nuspec files (dist paths, KVU configuration, versioningTwins, namespace), ASP.NET Core bootstrap review, launch profile clean-up (Development / Infra), repository, .sln folder and /doc layout (README, LICENSE, AGENTS.md, Solution Items, src/targets, tests, ecosystem.md, epics, work) - no breaking renames of assembly names, namespaces or vendor prefixes; deviations go to doc/work/tech-debt.md. Load when a user asks to bring a solution, repository or project up to date, or for another larger structural refactoring.
 metadata:
-  version: "2026-10-21"
+  version: "2026-10-23"
 ---
 
 # Refactoring Processes
@@ -73,7 +73,8 @@ Bring touched project files into the designed state of `dotnet-sdk-style-project
 
 - each `<file src>` resolves (relative to the `.nuspec`) to an output of the canonical BUILD, i.e. `dist\<tfm>\<AssemblyName>.dll` / `.xml` / `.pdb` - not legacy `dist\bin-net8.0\` paths;
 - every packaged target framework has its `dll`, `xml` and `pdb` entries and a matching `lib/<tfm>` target; no entries for dropped frameworks;
-- the `dependencies` contain one `<group targetFramework="...">` per packaged framework.
+- the `dependencies` contain one `<group targetFramework="...">` per packaged framework;
+- the form matches the package design of `nuget-semantic-versioning-kvu` (section 4): root element with the nuspec namespace, all metadata written out (no `$...$` tokens), one package per multi-targeted library; deviations are plan items.
 
 **b) KVU pre-processor configuration.** KVU reads exactly one JSON configuration from an XML comment inside the `.nuspec` (more than one fails the build; none means `DoMagic` skips the file completely, not even the version is written). Details: `nuget-semantic-versioning-kvu`. Check:
 
@@ -81,7 +82,7 @@ Bring touched project files into the designed state of `dotnet-sdk-style-project
 - no other XML comment of the `.nuspec` contains braces (they would be parsed as configuration);
 
 - `versioningTwins` lists exactly the packages built **from the same repository** that this package references via `ProjectReference`. KVU writes them as exact `[<version>]` dependencies into every group and excludes them from synchronization and orphan removal. Missing twin: the package would reference a stale or wrong version of its sibling. External package listed as twin: it would be forced to this package's version.
-- `dependencySync.sources` contains one entry per target framework project of the package, with `"targetFramework":"="` when the `.nuspec` uses groups; every `origin` path (relative to the `.nuspec`) resolves - re-check after renames.
+- `dependencySync.sources` contains one entry per target framework project of the package, with `"targetFramework":"="` when the `.nuspec` uses groups (the `net48` shell: explicit `".NETFramework4.8"`, see `nuget-semantic-versioning-kvu`); every `origin` path (relative to the `.nuspec`) resolves - re-check after renames.
 - `constraintLevel` and the flags (`addMissing`, `updateExisting`, `allowDowngrades`, `removeOrphaned`) are set deliberately; compare with sibling `.nuspec` files of the repository and report inconsistencies instead of unifying them silently.
 
 ```xml
@@ -111,9 +112,25 @@ The authoritative implementation is KVU (`VersioningUtil`, see `smart-standards-
 
 For every web host, review `Program.cs` / `Startup.cs` against `asp-net-core-development-guidelines` and its `references/application-bootstrap.md` (canonical `Program.Main`, the two hooks, `UseAmbientFieldAdapterMiddleware` first, no static configuration) and the launch-profile handling of `smart-solution-and-project-structure`. A migration into the designed state is a separate plan item with its own confirmation; follow the migration rules of that reference.
 
+**Launch profiles and configuration files.** For every web host, compare `Properties/launchSettings.json` and the `appsettings*.json` files with section `Launch Profile and Configuration Design` of `smart-solution-and-project-structure` (profiles `Development` and `Infra`, optional `Infra-<Qualifier>`; profile name = environment name; no IIS Express, project-named or branch-named profiles; no local connection strings in `appsettings.json`). The clean-up is one plan item per host, risk `needs decision`, because renaming an environment changes which files and code paths are active. The plan item lists:
+
+- profiles to remove (IIS Express, `iisSettings`, project-named profiles), to rename and to add; the existing ports are kept; which old profile becomes `Development` and which `Infra` is decided by the user when it is not evident from the connection strings;
+- appsettings files to rename along with their environment (e.g. `appsettings.Dev.json` -> `appsettings.Development.json`, values for the shared infrastructure -> `appsettings.Infra.json`), with the split of their values where one file served both scenarios; branch-dependent values found in profile or environment files are proposed as `appsettings.<Branch>.json` entries;
+- local connection strings in `appsettings.json` to move into `appsettings.Development.json` / `appsettings.Infra.json` - only after the user has confirmed that deployment does not rely on them;
+- code depending on environment names (`IsDevelopment()`, `IsEnvironment(...)`, `IsProduction()`, string comparisons with environment names), especially `IsDevelopment()` checks whose behavior is also needed with `Infra` (e.g. Swagger) and checks for removed environment names; each one is reported with a proposal (e.g. an explicit setting), never silently rewritten (rule 6);
+- every reference to old profile names or `LaunchProfile=<index>` arguments in launcher configurations, scripts, pipelines, `/doc` and the project skill.
+
 ### E. Repository Conventions
 
-Check conformance with `smart-solution-and-project-structure` and the conventions visible in comparable repositories of the landscape (e.g. `dotnet\` with solution, `.nuspec` files, `src\`, `test\`, `dist\`).
+Check conformance with `smart-solution-and-project-structure` and the conventions visible in comparable repositories of the landscape (e.g. `dotnet\` with solution, `.nuspec` files, `src\`, `tests\`, `dist\`).
+
+**Repository conventions and solution layout** (sections `Repository Conventions` and `Solution Layout (.NET)` of `smart-solution-and-project-structure`) - check and plan:
+
+- default branch is `master` (report a deviation; never change repository settings or create `main`);
+- vendor prefix in solution, project, assembly, namespace or package names: breaking, record in `doc/work/tech-debt.md`;
+- `.sln` virtual folders: `Solution Items` with `..\doc\changelog.md` and every `.nuspec`, `src` with shared and non-target projects, `src/targets` with the target shells, `tests` with the test projects - non-breaking, fix in the plan;
+- physical test folder `test\` -> `tests\`: separate plan item (paths in `.sln`, pipelines and scripts change along);
+- applications, tools and tests `IsPackable=false` and without `.nuspec`.
 
 **Repository layout** (section `Repository Layout of Standalone Solutions` of `smart-solution-and-project-structure`; in repositories without code `/doc` and its files are optional, but what exists must conform) - check and plan:
 
@@ -158,9 +175,11 @@ Then stop and wait for confirmation.
 - [ ] Renamed projects: folder, file, `.sln` entry, `ProjectReference`s, linked files, `.nuspec` sources and paths, pipelines updated.
 - [ ] `AssemblyName`, `PackageId`, namespaces unchanged; deviations recorded in `/doc/work/tech-debt.md`.
 - [ ] Root: `README.md` (links to all `/doc` files), `LICENSE` (open source), `AGENTS.md`, `CLAUDE.md` (`@AGENTS.md`), `.editorconfig` mirror; `.agents/skills/` with mandatory skill copy and project skill.
+- [ ] `.sln`: `Solution Items` (changelog, `.nuspec` files), `src` / `src/targets`, `tests`; vendor prefixes only reported.
 - [ ] `/doc`: no numeric prefixes, no `README.*`, `ecosystem.md`, `decisions/`, `epics/`, `work/backlog.md`, `work/tech-debt.md`.
 - [ ] `.nuspec` paths match `dist\<tfm>\`; exactly one KVU comment in every `.nuspec` (at least `"KVU": { }`), no braces in other comments; `versioningTwins` = same-repository siblings; sources resolve.
 - [ ] Bootstrap reviewed; migration only if confirmed.
+- [ ] Launch profiles: `Development` + `Infra` (+ `Infra-<Qualifier>`), profile name = environment name, no IIS Express / project / branch names, ports kept; appsettings files renamed along; no local connection strings in `appsettings.json` (if confirmed); environment-name checks reported; launcher / script references updated.
 - [ ] No unconfirmed package changes; no coding-rules sweep.
 - [ ] `changelog.md` changed at most below `## Upcoming Changes`; consumer-visible changes reported with a proposed commit prefix or entry.
 - [ ] Build result reported honestly; nothing committed.
