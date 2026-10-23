@@ -46,7 +46,7 @@ WP-<PluginName>/
 ├── .kvu/templates/self-update.php     # copied unchanged from the release template
 ├── .editorconfig                      # mirror from csharp-coding-standards (2 spaces, CRLF)
 ├── .gitignore                         # at least: dist/  __pycache__/  *.pyc
-├── LICENSE                            # GPL
+├── LICENSE                            # GPL v3 text
 ├── README.md
 ├── doc/                               # changelog.md + generated release files + documentation
 ├── <slug>/                            # the plugin itself = exactly what lands in the ZIP
@@ -76,7 +76,7 @@ WP-<PluginName>/
 | Constants | upper-case short prefix + `FILE`, `DIR`, `URL`, `VERSION` | `KORNSW_RA_DIR` |
 | DB tables | `$wpdb->prefix . '<short prefix><name>'` | `wp_kornsw_ra_sources` |
 | REST namespace | `<slug>/v1` | `kornsw-remotearticles/v1` |
-| License | GPL-2.0-or-later (`License:` header + `LICENSE` file) | |
+| License | GPL-3.0: `LICENSE` file with the GPL v3 text, header `License: GPL-3.0` (never choose or change a license on your own) | |
 
 - Everything global (options, transients, tables, hook names, global functions, constants, CSS class roots, JS globals) carries the plugin prefix; classes live in the plugin namespace.
 - Forks of third-party plugins keep the original slug with a `-<vendor>-fork` suffix and keep the original author, adding "(featured by <vendor>)".
@@ -104,7 +104,7 @@ Order inside `<slug>/<slug>.php`:
  * Requires at least: <current WordPress major>
  * Requires PHP:      <newest stable PHP minor>
  * Author:            KornSW
- * License:           GPL-2.0-or-later
+ * License:           GPL-3.0
  * Text Domain:       <slug>
  */
 
