@@ -1,6 +1,6 @@
 ---
 name: smart-solution-and-project-structure
-description: Common repository conventions and the ASP.NET Core hosting template of the SmartStandards landscape - the repository layout of standalone solutions (root README, LICENSE, AGENTS.md, CLAUDE.md, .editorconfig mirror, .agents/skills, /doc with requirements, architecture, quickstart, ecosystem.md, decisions/, epics/, work/backlog.md and tech-debt.md, changelog.md) and the SmartStandards.AspNetCoreTemplate / SmartStandards.WebApiDependencies startup pattern (Program.Main, LaunchProfileHelper with "LaunchProfile=<name>", branch-specific appsettings files, SmartStandardsCheapInitializer), plus the launch profile design (profiles Development, Infra, Infra-<Qualifier>; profile name = environment name; no IIS Express, project-named or branch-named profiles; no local connection strings in appsettings.json). Use when writing or debugging Program.Main of a SmartStandards-style ASP.NET Core Web API, when creating or cleaning up launchSettings.json, when a service behaves differently started from Visual Studio vs. as EXE (e.g. falls back to port 5000), or when appsettings.<Branch>.json files are involved. Snapshot of the upstream skills; escalate to the upstream repositories for library development or deep troubleshooting.
+description: Repository conventions and the ASP.NET Core hosting template of the SmartStandards landscape - default branch master, default license for new open-source repositories (MIT + Commons Clause), repository layout (README, LICENSE, AGENTS.md, CLAUDE.md, .editorconfig mirror, .agents/skills, /doc with requirements, architecture, quickstart, ecosystem.md, decisions/, epics/, work/, changelog.md), .NET names without vendor prefix, .sln folder layout (Solution Items with changelog.md and .nuspec files, src, src/targets, tests), the SmartStandards.AspNetCoreTemplate startup pattern (Program.Main, LaunchProfileHelper, branch-specific appsettings) and the launch profile design (Development, Infra, Infra-<Qualifier>; profile name = environment name). Use when creating a repository or solution, reviewing root files, /doc or .sln structure, writing Program.Main or launchSettings.json, or when a service behaves differently from Visual Studio vs. as EXE. Snapshot; escalate upstream for library work.
 metadata:
   snapshot-date: "2026-10-19"
 ---
@@ -9,11 +9,11 @@ metadata:
 
 <!-- Layer 1 - Domain Overview -->
 
-How SmartStandards repositories and hosts are structured and started. This skill covers the repository and documentation layout of standalone solutions (a landscape convention, see `Repository Layout of Standalone Solutions`), the ASP.NET Core hosting template and the design of launch profiles and configuration files (a landscape convention, see `Launch Profile and Configuration Design`). Further conventions of the domain (shared projects, multi-targeting) are not yet covered here - read the `most-important-details-for-*` skill of the respective repository.
+How SmartStandards repositories and hosts are structured and started. This skill covers the basic repository conventions (default branch, license, naming; see `Repository Conventions`), the repository and documentation layout of standalone solutions (see `Repository Layout of Standalone Solutions`), the layout of .NET solutions (see `Solution Layout (.NET)`), the ASP.NET Core hosting template and the design of launch profiles and configuration files (see `Launch Profile and Configuration Design`). All sections except the hosting template are landscape conventions, not snapshots of an upstream repository. Code-level details of shared projects are not covered here - read the `most-important-details-for-*` skill of the respective repository.
 
-- Libraries / repositories in scope: `AspNetCoreTemplate` (package `SmartStandards.WebApiDependencies`)
-- Use for: creating or reviewing the root files and the `/doc` folder of a repository, `Program.Main` of a SmartStandards-style Web API, launch profiles for directly started EXEs, the designed state of `launchSettings.json` and the appsettings files, branch-specific configuration files
-- Out of scope: UJMW, SmartAmbience and logging internals (only wired by the template) - see `smart-http-remoting-standard`, `smart-dataflow-and-ambience`; versioning - see `nuget-semantic-versioning-kvu`
+- Libraries / repositories in scope: `AspNetCoreTemplate` (package `SmartStandards.WebApiDependencies`); reference solution for the solution layout: `ComponentDiscovery`
+- Use for: creating a new repository or solution, reviewing the root files, the `/doc` folder or the `.sln` structure, `Program.Main` of a SmartStandards-style Web API, launch profiles for directly started EXEs, the designed state of `launchSettings.json` and the appsettings files, branch-specific configuration files
+- Out of scope: UJMW, SmartAmbience and logging internals (only wired by the template) - see `smart-http-remoting-standard`, `smart-dataflow-and-ambience`; project file contents - see `dotnet-sdk-style-project-files`; versioning and `.nuspec` contents - see `nuget-semantic-versioning-kvu`
 - Bringing a whole solution up to date (target frameworks, renames, nuspec, conformance check against this skill): follow the general skill `refactoring-processes`
 
 <!-- Layer 2 - Cached Essentials -->
@@ -131,6 +131,29 @@ Local development knows only two scenarios. Branch-dependent differences are not
 - Deployed hosts are not configured via launch profiles; the hosting environment (e.g. `web.config`, environment variables) sets the environment, and branch files are not applied without Git.
 - `IsDevelopment()` is `true` only for `Development`; with `Infra` / `Infra-<Qualifier>` it is `false`, so the framework defaults bound to `Development` are off there. Do not add more `IsDevelopment()` checks for behavior that is also needed with `Infra` (e.g. Swagger, diagnostics); switch it via explicit settings (e.g. `ProdMode` of `SmartStandardsCheapInitializer`) instead of further environment names.
 
+## Repository Conventions
+
+Landscape convention (user decision 2026-10-23); applies to every repository of the landscape.
+
+### Default Branch
+
+- **`master`** is the default branch of every repository. Agents work on the repository's existing default branch and never create `main`.
+- **First push of an empty repository goes to `master`.** GitHub makes the first pushed branch the default branch, so pushing `main` (or a feature branch) first silently changes the default. Agent environments often cannot change repository settings afterwards (e.g. cloud sessions); pushing `master` first makes that unnecessary.
+- KVU's ignore list `master;main;rel-*` only tolerates `main`; it is no recommendation (see `nuget-semantic-versioning-kvu`).
+
+### License
+
+- **Default for new open-source repositories: MIT + Commons Clause** (`LICENSE` = MIT license text followed by the Commons Clause condition). Name it in the README `License` section.
+- Existing repositories keep their license. Never change a license, and never deviate from the default for a new repository, without asking.
+- In `.nuspec` files, MIT + Commons Clause has no SPDX expression; ship the license file instead (see `nuget-semantic-versioning-kvu`, section 4).
+
+### No Vendor Prefix in .NET Names
+
+- The vendor (GitHub owner or publisher, e.g. `KornSW`) never appears in solution names, project folders, project file names, assembly names, root namespaces or package ids: `src/Example.Product.net10.0/Example.Product.net10.0.csproj`, not `Vendor.Example.Product.net10.0.csproj`.
+- The vendor appears only in package metadata (`authors`, `owners`, `copyright`) and in the repository URL. Package id = assembly name (see `dotnet-sdk-style-project-files`, section 3).
+- **`SmartStandards.*`** is the established product-family prefix of the packages in repositories owned by `SmartStandards` (e.g. `SmartStandards.AiSupport`, `SmartStandards.Logging`). Existing names stay. Never introduce it, or any other organization name, in repositories of other owners. Whether new `SmartStandards` repositories keep the prefix is not decided yet; ask.
+- Renaming existing assemblies, namespaces or package ids is breaking; record it in `doc/work/tech-debt.md` instead (see `refactoring-processes`).
+
 ## Repository Layout of Standalone Solutions
 
 Landscape convention (user decision 2026-10-21), not a snapshot of an upstream repository; it applies to every Git repository that holds one standalone solution. It supersedes the older numbered layout (`1-requirements.md`, `2-architecture.md`, `3-quickstart.md`, `ideas.md`).
@@ -179,6 +202,7 @@ Rules:
 - **Other technical artifacts** currently found in `/doc` (e.g. tool binaries, pipeline exports, install scripts) are tolerated for now and left alone; they are not moved as part of a refactoring until a rule exists.
 - **`.github/`**: workflows as needed; a `copilot-instructions.md` contains only a pointer to `AGENTS.md` (like `CLAUDE.md`); issue / pull request templates are optional.
 - **`changelog.md` is left alone** apart from the KVU rules: agents may only add conformant entries below `## Upcoming Changes` (see `nuget-semantic-versioning-kvu`).
+- **New repositories with code** contain `doc/changelog.md` (standard header, `## Upcoming Changes` with `*(none)*`, no release block) and a matching `doc/versioninfo.json` (`0.0.0`) from the first commit on; templates in `nuget-semantic-versioning-kvu`, section 1.
 - **`ecosystem.md`** describes outgoing dependencies (libraries / services this repository builds on) and incoming ones (known consumers), but only
   1. entries that really matter for understanding or classifying this repository, and
   2. entries whose visibility is not narrower than this repository's: open-source repositories name only open-source dependencies and consumers; in an organization context, internal consumers may be named as well.
@@ -198,11 +222,47 @@ Rules:
   ```
 
   The documentation section links every file that lives directly in `/doc` (relative links), in the order requirements, architecture, quickstart, ecosystem, further documents, changelog, then the `decisions/`, `epics/` and `work/` folders.
-- **`LICENSE`** in the root of every open-source repository. Never choose or change a license on your own; ask.
+- **`LICENSE`** in the root of every open-source repository; default and rules in `Repository Conventions`.
 - **`AGENTS.md`** in the root, short: points agents to `.agents/skills/include-additional-mandatory-skills/SKILL.md` (or the organization twin) as the mandatory entry, to the project skill `most-important-details-for-<repo>` and to `/doc`. **`.agents/skills/`** contains the copy of `include-additional-mandatory-skills` (organization repositories: only the twin) and the project skill.
 - **`CLAUDE.md`** in the root contains only the import line `@AGENTS.md`, so tools reading `CLAUDE.md` and tools reading `AGENTS.md` get the same instructions. Content goes into `AGENTS.md`, never into `CLAUDE.md`.
 - **`.editorconfig`** in the root is an identical mirror of the leading version in `csharp-coding-standards` (`assets/.editorconfig`, header with version). Never edit the mirror; repository-specific deviations go into a nested `.editorconfig` without `root = true`. Older copies in sub-folders (e.g. `dotnet\.editorconfig`) are replaced by the root mirror; their deviating rules are reviewed and either dropped or kept in a nested file.
 - `README.md` and everything in `/doc` are written in English.
+
+## Solution Layout (.NET)
+
+Landscape convention (user decision 2026-10-23). Reference solution: `ComponentDiscovery` @ `a159ddb` (`dotnet/ComponentDiscovery.sln`); its `.nuspec` files carry known debt (see `nuget-semantic-versioning-kvu`, section 4).
+
+Virtual solution folders (names lower case, except `Solution Items`):
+
+```text
+Solution Items      ..\doc\changelog.md, <Package>.nuspec (one per package)
+src                 shared projects (.shproj) and all non-target projects (applications, hosts, tools)
+  targets           target shells per framework (<Name>.net48 / .net8.0 / .net10.0)
+tests               test projects
+```
+
+Physical layout:
+
+```text
+dotnet/
+├── <Solution>.sln
+├── <Package>.nuspec              # one per package, standalone, see nuget-semantic-versioning-kvu
+├── PackageIcon.png
+├── src/
+│   ├── <Name>/                   # shared project (.shproj + .projitems) with the code
+│   ├── <Name>.net48/             # target shells, flat next to the shared project
+│   ├── <Name>.net8.0/
+│   ├── <Name>.net10.0/
+│   └── <Application>/            # hosts, tools
+├── tests/
+│   └── <Name>.Tests/
+└── dist/<tfm>/                   # build output of the canonical BUILD
+```
+
+- **`changelog.md` is always a solution item** (`..\doc\changelog.md`), so the pending changes are visible in the IDE. Every `.nuspec` is a solution item, too.
+- **`targets`** exists whenever a library is multi-targeted via a shared project plus target-framework shells. The shells carry no own code; nesting them in `targets` keeps the solution focused on the shared project. `targets` is **only virtual**: physically the shells stay flat next to the shared project in `src/`.
+- **`tests`** is the folder name, physically and virtually. Older repositories using `test/` (e.g. `AiSupport`) are a tolerated deviation; renaming the physical folder is a separate plan item of `refactoring-processes`.
+- Applications, tools and test projects are not packaged (`IsPackable` false, no `.nuspec`); every multi-targeted library is published as one package containing all targets (see `nuget-semantic-versioning-kvu`, section 4).
 
 <!-- Layer 3 - Upstream Escalation -->
 

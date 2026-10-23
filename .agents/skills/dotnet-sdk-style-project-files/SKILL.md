@@ -2,7 +2,7 @@
 name: dotnet-sdk-style-project-files
 description: Designed state of SDK-style .NET project files (.csproj) - canonical section order (PROJECT, META DATA, BUILD, REFERENCES, INCLUDEs and FILEs, GENERATED FILES, SHARED PROJECTS), identity and metadata alignment (AssemblyName = PackageId = Description = file name, SourceContext assembly attribute), the canonical BUILD block (OutputPath ..\..\dist with SDK target-framework suffix, documentation file, custom compiler symbols NET_CORE;NET_8_;NET_10_;NET_10, Debug/Release deltas only, no x86/x64 duplication), project-type modules (library, contract, web, test, WinForms, hybrid WinForms + WebView2 + ASP.NET Core) and conditional feature templates (references, shared projects, T4, resx/settings, file exclusion, appsettings, embedded SPA, custom targets), plus pitfalls, validation checklist and a secondary migration algorithm. Load before creating, normalizing, reviewing or migrating any .csproj.
 metadata:
-  version: "2026-10-21"
+  version: "2026-10-23"
 ---
 
 # SDK-Style .NET Project Files
@@ -46,6 +46,7 @@ Formatting: two-space XML indentation, blank lines between conceptual sections, 
 ## 3. Identity and Metadata
 
 - The project file base name (without `.csproj`) equals `AssemblyName`, `PackageId` and normally `Description` - except for the target-framework suffix of side-by-side variants (`Example.Contract.net8.0.csproj` builds `Example.Contract`; see `refactoring-processes`).
+- **No vendor prefix**: the vendor (GitHub owner or publisher) never appears in the project file name, project folder, `AssemblyName`, `RootNamespace`, `PackageId` or solution name (`Example.Product.net10.0.csproj`, not `Vendor.Example.Product.net10.0.csproj`). It appears only in package metadata (`Authors`, `Company`, `Copyright`; in the `.nuspec` `authors`, `owners`, `copyright`) and the repository URL. Product-family prefixes and existing names: see `smart-solution-and-project-structure`, `Repository Conventions`.
 - `Title` may be a distinct user-facing application title.
 - `Product`, `RootNamespace` and `SourceContext` are intentionally simpler than the full assembly identity, often derived from the first meaningful product / namespace token. The exact universal derivation is not settled yet; ask if ambiguous.
 - Preserve existing meaningful `Company`, `Copyright`, `Authors`, `Version`, `AssemblyVersion`, `FileVersion`. Never replace them with empty values or reset versions.
@@ -157,6 +158,8 @@ Rules:
 - If parallel x86 / x64 outputs need separate directories, ask instead of changing the standard.
 
 Further properties established in the standardization work (use where the project type needs them): `LangVersion`, `IsPackable`, `IsTestProject`, `ProduceReferenceAssembly`, `CopyLocalLockFileAssemblies`.
+
+**Packaging**: project files never produce packages themselves (`GeneratePackageOnBuild=false`, no `dotnet pack` of a `.csproj`). A multi-targeted library is published as one package via a standalone `.nuspec` next to the solution that collects the `dist\<tfm>\` outputs of all target shells (see `nuget-semantic-versioning-kvu`, section 4). Applications, tools and test projects set `<IsPackable>false</IsPackable>`. Solution folders and physical layout: see `smart-solution-and-project-structure`, `Solution Layout (.NET)`.
 
 ## 5. Project-Type Modules
 
@@ -374,7 +377,8 @@ The GUID is illustrative, not a required value. Preserve custom MSBuild targets 
 ## 8. Validation Checklist
 
 - [ ] Correct SDK and target framework; WinForms stays `Microsoft.NET.Sdk`.
-- [ ] `AssemblyName` / `PackageId` / `Description` match the project file name.
+- [ ] `AssemblyName` / `PackageId` / `Description` match the project file name; no vendor prefix in names.
+- [ ] Applications, tools and tests `IsPackable=false`; libraries packaged only via the standalone `.nuspec`.
 - [ ] `RootNamespace` / `Product` / `SourceContext` coherent and intentionally short where appropriate.
 - [ ] PROJECT and META DATA order kept; `ApplicationIcon` in META DATA.
 - [ ] `Nullable` present (`disable` if it was absent); an existing value not silently changed.
