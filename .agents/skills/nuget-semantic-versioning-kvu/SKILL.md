@@ -88,7 +88,7 @@ released **2026-09-04**, including:
 - Metadata: `id` (= assembly name, no vendor prefix), `version`, `title`, `authors`, `owners`, `copyright`, `description`, `tags`, license, `requireLicenseAcceptance` false, `icon` `PackageIcon.png` (file next to the `.nuspec`), `projectUrl`.
 - License: SPDX comment plus `<license type="expression">` for licenses with an SPDX identifier (e.g. `GPL-3.0-only`). The landscape default for new repositories, MIT + Commons Clause, has none (and nuget.org accepts expressions only for OSI / FSF-approved licenses): use `<license type="file">LICENSE</license>` and pack the root `LICENSE` file. Not yet verified with a real `nuget pack`; check on first use.
 - `dependencies`: one `<group targetFramework="...">` per target (`.NETFramework4.8`, `net8.0`, `net10.0`) with `SEM-SAFE` ranges `[x.y.z, (x+1).0)`, maintained by KVU.
-- `files`: the icon (and the license file, if used), then per target a commented block with `dist\<tfm>\<Assembly>.dll`, `.xml` and `.pdb` -> `lib/<tfm>`.
+- `files`: the icon (and the license file, if used), then per target a commented block with `dist\Shared\<tfm>\<Assembly>.dll`, `.xml` and `.pdb` -> `lib/<tfm>`.
 - The **KVU comment is mandatory** (see below): `dependencySync` with one source per target shell (`"targetFramework":"="`; the `net48` shell needs the explicit `".NETFramework4.8"`, because KVU compares the project's raw `TargetFramework` value with the group name as plain text, verified 2026-10-23), `constraintLevel` `SEM-SAFE`, `addMissing` / `updateExisting` / `allowDowngrades` true, `removeOrphaned` false; `versioningTwins` lists the same-repository packages referenced via `ProjectReference`.
 - Applications, tools and test projects are not packaged (`IsPackable` false, no `.nuspec`).
 
@@ -135,17 +135,17 @@ released **2026-09-04**, including:
     <file src="PackageIcon.png" target="" />
     <file src="..\LICENSE" target="" />
     <!-- .NET 4.8 -->
-    <file src="dist\net48\Example.Product.dll" target="lib/net48" />
-    <file src="dist\net48\Example.Product.xml" target="lib/net48" />
-    <file src="dist\net48\Example.Product.pdb" target="lib/net48" />
+    <file src="dist\Shared\net48\Example.Product.dll" target="lib/net48" />
+    <file src="dist\Shared\net48\Example.Product.xml" target="lib/net48" />
+    <file src="dist\Shared\net48\Example.Product.pdb" target="lib/net48" />
     <!-- .NET 8.0 -->
-    <file src="dist\net8.0\Example.Product.dll" target="lib/net8.0" />
-    <file src="dist\net8.0\Example.Product.xml" target="lib/net8.0" />
-    <file src="dist\net8.0\Example.Product.pdb" target="lib/net8.0" />
+    <file src="dist\Shared\net8.0\Example.Product.dll" target="lib/net8.0" />
+    <file src="dist\Shared\net8.0\Example.Product.xml" target="lib/net8.0" />
+    <file src="dist\Shared\net8.0\Example.Product.pdb" target="lib/net8.0" />
     <!-- .NET 10.0 -->
-    <file src="dist\net10.0\Example.Product.dll" target="lib/net10.0" />
-    <file src="dist\net10.0\Example.Product.xml" target="lib/net10.0" />
-    <file src="dist\net10.0\Example.Product.pdb" target="lib/net10.0" />
+    <file src="dist\Shared\net10.0\Example.Product.dll" target="lib/net10.0" />
+    <file src="dist\Shared\net10.0\Example.Product.xml" target="lib/net10.0" />
+    <file src="dist\Shared\net10.0\Example.Product.pdb" target="lib/net10.0" />
   </files>
 </package>
 ```
@@ -217,7 +217,7 @@ The landscape builds with Azure DevOps; a reference YAML pipeline is not documen
    3. sets the Azure DevOps build number and the variables `CurrentVersion`, `CurrentVersionWithSuffix`, `PreviousVersion`, `ChangeGrade`, `ReleaseType`, `PreReleaseSuffix`, `CurrentMajor`, `CurrentMinor`, `CurrentFix`, `VersionDateInfo`, `VersionTimeInfo`, `VersionNotes` (other CI systems: read `versioninfo.json`);
    4. patches `*.csproj`, `*.vbproj`, `package.json`, `AssemblyInfo.cs` / `.vb`;
    5. processes all `*.nuspec` files with a KVU configuration (section 4).
-4. **Build** the solution and **pack** the `.nuspec` files (they reference `dist\<tfm>\` outputs, see `dotnet-sdk-style-project-files`); publish packages.
+4. **Build** the solution and **pack** the `.nuspec` files (they reference `dist\Shared\<tfm>\` outputs, see `dotnet-sdk-style-project-files`); publish packages.
 5. **Commit back** (usually after the package push) all files changed by KVU (changelog, `versioninfo.json`, project files, `AssemblyInfo`, `.nuspec`) with the message `<subject of the triggering commit> -> VERSIONING [skip ci]` and push to the source branch. `VERSIONING` keeps the commit out of the next git fallback; the skip-CI marker is **mandatory** - without it the push restarts the pipeline and produces versions in an endless loop.
 
 Older pipelines use separate steps (`CreateNewVersionOnChangelog ".\doc\versioninfo.json" ".\doc\changelog.md" <branch> <primary branch>`, then `ImportVersion` per file type). They do not process the `.nuspec` pre-processor configuration; prefer `DoMagic`.
@@ -246,7 +246,7 @@ WordPress plugin repositories on GitHub use a minimal Python re-implementation o
 ## 8. Neighbors
 
 - `refactoring-processes` - checks `.nuspec` paths and KVU configuration when a solution is brought up to date.
-- `dotnet-sdk-style-project-files` - `dist\<tfm>\` output layout the `.nuspec` files point to.
+- `dotnet-sdk-style-project-files` - `dist\Shared\<tfm>\` output layout the `.nuspec` files point to (role-based layout: `smart-solution-and-project-structure`, `Build Output Layout (dist)`).
 - `package-version-preferences-dot-net` - which external package versions are wanted (KVU only synchronizes them).
 
 ## 9. Upstream Sources

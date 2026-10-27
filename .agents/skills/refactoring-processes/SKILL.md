@@ -65,13 +65,13 @@ When a project changes its target framework, a variant is added or a variant is 
 
 A new variant (e.g. a missing `net10.0` contract) is created by copying the closest existing variant and applying `dotnet-sdk-style-project-files`. Dropping a variant (e.g. `net6.0`) removes the project from the `.sln` and the `.nuspec` and is visible to consumers (rule 7).
 
-Bring touched project files into the designed state of `dotnet-sdk-style-project-files` (section order, canonical BUILD with `OutputPath ..\..\dist` and SDK target-framework suffix). Untouched project files with gross deviations are reported as separate, optional plan items.
+Bring touched project files into the designed state of `dotnet-sdk-style-project-files` (section order, canonical BUILD with the role-based `OutputPath` - `..\..\dist\Shared` for libraries, `..\..\dist\<ArtifactName>` for runnable artifacts, own `bin` for tests - and SDK target-framework suffix). Untouched project files with gross deviations are reported as separate, optional plan items.
 
 ### C. NuSpec Files
 
 **a) Paths into `dist`.** For every `.nuspec`:
 
-- each `<file src>` resolves (relative to the `.nuspec`) to an output of the canonical BUILD, i.e. `dist\<tfm>\<AssemblyName>.dll` / `.xml` / `.pdb` - not legacy `dist\bin-net8.0\` paths;
+- each `<file src>` resolves (relative to the `.nuspec`) to an output of the canonical BUILD, i.e. `dist\Shared\<tfm>\<AssemblyName>.dll` / `.xml` / `.pdb` - not legacy `dist\bin-net8.0\` or flat `dist\<tfm>\` paths;
 - every packaged target framework has its `dll`, `xml` and `pdb` entries and a matching `lib/<tfm>` target; no entries for dropped frameworks;
 - the `dependencies` contain one `<group targetFramework="...">` per packaged framework;
 - the form matches the package design of `nuget-semantic-versioning-kvu` (section 4): root element with the nuspec namespace, all metadata written out (no `$...$` tokens), one package per multi-targeted library; deviations are plan items.
@@ -165,7 +165,7 @@ Then stop and wait for confirmation.
 ## 5. Phase 3 - Execution (after confirmation only)
 
 1. Execute only the confirmed items, in this order: target framework structure and renames (B) -> project files (B) -> `.nuspec` files (C) -> confirmed package changes (A) -> bootstrap migration (D) -> repository layout and documentation, including tech-debt entries (E).
-2. Build the solution when tooling is available (e.g. `dotnet build <solution>`) and check that the `dist\<tfm>\` outputs referenced by the `.nuspec` files exist. If not possible, say so.
+2. Build the solution when tooling is available (e.g. `dotnet build <solution>`) and check that the `dist\Shared\<tfm>\` outputs referenced by the `.nuspec` files exist. If not possible, say so.
 3. Report: what was changed, what was verified, what was not, open questions, proposed changelog entries. Do not commit.
 
 ## 6. Checklist
@@ -177,7 +177,7 @@ Then stop and wait for confirmation.
 - [ ] Root: `README.md` (links to all `/doc` files), `LICENSE` (open source), `AGENTS.md`, `CLAUDE.md` (`@AGENTS.md`), `.editorconfig` mirror; `.agents/skills/` with mandatory skill copy and project skill.
 - [ ] `.sln`: `Solution Items` (changelog, `.nuspec` files), `src` / `src/targets`, `tests`; vendor prefixes only reported.
 - [ ] `/doc`: no numeric prefixes, no `README.*`, `ecosystem.md`, `decisions/`, `epics/`, `work/backlog.md`, `work/tech-debt.md`.
-- [ ] `.nuspec` paths match `dist\<tfm>\`; exactly one KVU comment in every `.nuspec` (at least `"KVU": { }`), no braces in other comments; `versioningTwins` = same-repository siblings; sources resolve.
+- [ ] `.nuspec` paths match `dist\Shared\<tfm>\`; runnable artifacts build into `dist\<ArtifactName>\<tfm>\`, tests into their own `bin`; exactly one KVU comment in every `.nuspec` (at least `"KVU": { }`), no braces in other comments; `versioningTwins` = same-repository siblings; sources resolve.
 - [ ] Bootstrap reviewed; migration only if confirmed.
 - [ ] Launch profiles: `Development` + `Infra` (+ `Infra-<Qualifier>`), profile name = environment name, no IIS Express / project / branch names, ports kept; appsettings files renamed along; no local connection strings in `appsettings.json` (if confirmed); environment-name checks reported; launcher / script references updated.
 - [ ] No unconfirmed package changes; no coding-rules sweep.

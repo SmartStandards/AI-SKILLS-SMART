@@ -256,13 +256,45 @@ dotnet/
 │   └── <Application>/            # hosts, tools
 ├── tests/
 │   └── <Name>.Tests/
-└── dist/<tfm>/                   # build output of the canonical BUILD
+└── dist/                         # build output, see Build Output Layout (dist)
+    ├── Shared/<tfm>/             # packaged / shared libraries
+    └── <ArtifactName>/<tfm>/     # runnable bundle per Web API / EXE
 ```
 
 - **`changelog.md` is always a solution item** (`..\doc\changelog.md`), so the pending changes are visible in the IDE. Every `.nuspec` is a solution item, too.
 - **`targets`** exists whenever a library is multi-targeted via a shared project plus target-framework shells. The shells carry no own code; nesting them in `targets` keeps the solution focused on the shared project. `targets` is **only virtual**: physically the shells stay flat next to the shared project in `src/`.
 - **`tests`** is the folder name, physically and virtually. Older repositories using `test/` (e.g. `AiSupport`) are a tolerated deviation; renaming the physical folder is a separate plan item of `refactoring-processes`.
 - Applications, tools and test projects are not packaged (`IsPackable` false, no `.nuspec`); every multi-targeted library is published as one package containing all targets (see `nuget-semantic-versioning-kvu`, section 4).
+
+### Build Output Layout (dist)
+
+Landscape convention (user decision 2026-10-24). The build output is cut by the role of the project, not by one shared folder for everything. Project file implementation: see `dotnet-sdk-style-project-files`, section 4.
+
+```text
+dist/
+├── Shared/
+│   ├── net8.0/                   # -> NuGet (lib/net8.0)
+│   └── net10.0/                  # -> NuGet (lib/net10.0)
+└── <ArtifactName>/
+    ├── net8.0/                   # runnable bundle incl. all references
+    └── net10.0/
+```
+
+| Role | Output | Content |
+| --- | --- | --- |
+| Shared library - a) packaged as NuGet, b) consumed by other solutions in the same build, c) test support / test content | `dist/Shared/<tfm>/` | The official build output of libraries that are no runnable artifact. Only the library's own files (`.dll`, `.xml`, `.pdb`, own content). For .NET (Core) no peer dependencies are copied in - nothing is executed from here. |
+| Runnable artifact (Web API, Windows EXE) | `dist/<ArtifactName>/<tfm>/` | Cherry-picked, clean bundle of one operable artifact with all its references and content. |
+| Test project | own `bin` of the test project | Nothing in `dist`. |
+
+Rules:
+
+- **Bundles are produced by MSBuild itself**: redirection of the build output (`OutputPath`), copy-local of references and content items (`CopyToOutputDirectory`). No make- / batch-like scripts that assemble the bundle.
+- `AfterBuild` / custom copy targets only in absolute special cases; with .NET (Core) they should not be necessary. Document the reason in the project file.
+- `<ArtifactName>` is set explicitly in the `OutputPath` of the host project (normally the product or assembly name of the artifact). Every runnable artifact has its own folder; artifacts never share a folder with each other or with `Shared`.
+- Libraries referenced by an artifact reach the bundle via the `ProjectReference` / `PackageReference` copy-local of the host - not by copying from `dist/Shared`.
+- `.nuspec` files reference only `dist\Shared\<tfm>\` (see `nuget-semantic-versioning-kvu`, section 4).
+- `dist` is lower case (folder naming convention); `Shared` and `<ArtifactName>` keep their casing.
+- .NET Framework targets (e.g. `net48`) use the same folder structure; whether peer dependencies end up in `dist/Shared/net48/` follows the classic copy-local behavior and is not normative.
 
 <!-- Layer 3 - Upstream Escalation -->
 

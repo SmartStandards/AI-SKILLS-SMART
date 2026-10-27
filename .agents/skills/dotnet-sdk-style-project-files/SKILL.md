@@ -2,7 +2,7 @@
 name: dotnet-sdk-style-project-files
 description: Designed state of SDK-style .NET project files (.csproj) - canonical section order (PROJECT, META DATA, BUILD, REFERENCES, INCLUDEs and FILEs, GENERATED FILES, SHARED PROJECTS), identity and metadata alignment (AssemblyName = PackageId = Description = file name, SourceContext assembly attribute), the canonical BUILD block (OutputPath ..\..\dist with SDK target-framework suffix, documentation file, custom compiler symbols NET_CORE;NET_8_;NET_10_;NET_10, Debug/Release deltas only, no x86/x64 duplication), project-type modules (library, contract, web, test, WinForms, hybrid WinForms + WebView2 + ASP.NET Core) and conditional feature templates (references, shared projects, T4, resx/settings, file exclusion, appsettings, embedded SPA, custom targets), plus pitfalls, validation checklist and a secondary migration algorithm. Load before creating, normalizing, reviewing or migrating any .csproj.
 metadata:
-  version: "2026-10-23"
+  version: "2026-10-24"
 ---
 
 # SDK-Style .NET Project Files
@@ -107,13 +107,13 @@ Formatting: two-space XML indentation, blank lines between conceptual sections, 
 
 ## 4. Canonical BUILD
 
-This is the authoritative common BUILD block for all project types, including WinForms `net10.0-windows`:
+This is the authoritative common BUILD block for all project types, including WinForms `net10.0-windows`. Shown for a library; only the `OutputPath` depends on the role (see rules below):
 
 ```xml
 <!-- BUILD -->
 
 <PropertyGroup>
-  <OutputPath>..\..\dist</OutputPath>
+  <OutputPath>..\..\dist\Shared</OutputPath>
   <AppendTargetFrameworkToOutputPath>true</AppendTargetFrameworkToOutputPath>
   <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -135,7 +135,15 @@ This is the authoritative common BUILD block for all project types, including Wi
 
 Rules:
 
-- One `OutputPath` `..\..\dist`; the SDK appends the target framework (`AppendTargetFrameworkToOutputPath=true`); `AppendRuntimeIdentifierToOutputPath=false`.
+- One `OutputPath` per project, chosen by role (decision 2026-10-24, see `smart-solution-and-project-structure`, `Build Output Layout (dist)`); the SDK appends the target framework (`AppendTargetFrameworkToOutputPath=true`); `AppendRuntimeIdentifierToOutputPath=false`:
+
+  | Role | `OutputPath` | Result |
+  | --- | --- | --- |
+  | Library / target shell (packaged, consumed by other solutions, test support) | `..\..\dist\Shared` | `dist\Shared\<tfm>\` |
+  | Runnable artifact (Web API, EXE) | `..\..\dist\<ArtifactName>` (explicit literal) | `dist\<ArtifactName>\<tfm>\` |
+  | Test | none (omit `OutputPath`, SDK default) | `bin\<Configuration>\<tfm>\` of the test project |
+
+- .NET (Core) libraries do not copy peer dependencies into `dist\Shared` (no `CopyLocalLockFileAssemblies=true`). Runnable artifacts get their complete bundle via copy-local and content items; `AfterBuild` / custom copy targets only in documented special cases.
 - No `BaseOutputPath` alias, no hard-coded `bin-net6.0` / `bin-net8.0` / `bin-net10.0`. Legacy `BaseOutputPath` and `DocumentationFile` are migration inputs, not substitutes.
 - `GenerateDocumentationFile`, `GeneratePackageOnBuild`, common `NoWarn` and framework constants live in one unconditional group.
 - Configuration-specific groups contain only the `TRACE` / `DEBUG` and `Optimize` differences - no repeated paths or warnings.
@@ -154,22 +162,22 @@ Rules:
   | other targets (e.g. `net48`, `net6.0`, `net9.0`) | - | open; ask |
 
   Code uses `#if NET_8_` for "net8 or newer" and `#if NET_10` only for code that must exist exactly in net10.
-- The SDK-suffixed output path differs physically from old hard-coded directories (`dist\net10.0\` instead of `dist\bin-net10.0\`). The new path stays canonical; when converting, search the repository for consumers of the old path (`.nuspec` files, build / release pipelines, scripts, versioning tooling, documentation) and adapt them in the same change, or ask if they live outside the repository.
+- The role-based output paths differ physically from old directories (`dist\Shared\net10.0\` instead of `dist\bin-net10.0\` or `dist\net10.0\`). The new path stays canonical;
 - If parallel x86 / x64 outputs need separate directories, ask instead of changing the standard.
 
 Further properties established in the standardization work (use where the project type needs them): `LangVersion`, `IsPackable`, `IsTestProject`, `ProduceReferenceAssembly`, `CopyLocalLockFileAssemblies`.
 
-**Packaging**: project files never produce packages themselves (`GeneratePackageOnBuild=false`, no `dotnet pack` of a `.csproj`). A multi-targeted library is published as one package via a standalone `.nuspec` next to the solution that collects the `dist\<tfm>\` outputs of all target shells (see `nuget-semantic-versioning-kvu`, section 4). Applications, tools and test projects set `<IsPackable>false</IsPackable>`. Solution folders and physical layout: see `smart-solution-and-project-structure`, `Solution Layout (.NET)`.
+that collects the `dist\Shared\<tfm>\` outputs of all target shells
 
 ## 5. Project-Type Modules
 
 | Type | SDK | Notes |
 | --- | --- | --- |
-| Library | `Microsoft.NET.Sdk` | Optional: `<ProduceReferenceAssembly>True</ProduceReferenceAssembly>`, `<CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>`. |
+| Library | `Microsoft.NET.Sdk` | `OutputPath ..\..\dist\Shared`. Optional: `<ProduceReferenceAssembly>True</ProduceReferenceAssembly>`. No `CopyLocalLockFileAssemblies=true` for .NET (Core) (no peer dependencies in `dist\Shared`). |
 | Contract | `Microsoft.NET.Sdk` | Often shared `.projitems`, WCF-related dependencies, generated resources, compatibility / legacy references. The contract role is no permission to delete unexpected references. |
-| Web | `Microsoft.NET.Sdk.Web` | May have the XML documentation copy target (section 6), a `wwwroot` folder and web-specific content. |
-| Test | `Microsoft.NET.Sdk` | Conditional: `<LangVersion>latest</LangVersion>`, `<IsPackable>false</IsPackable>`, `<IsTestProject>true</IsTestProject>`; optional `<Using Include="Microsoft.VisualStudio.TestTools.UnitTesting" />` in an `ItemGroup`. Versions may deliberately be `0.0.0` / `0.0.0.0`. |
-| WinForms | `Microsoft.NET.Sdk` | `WinExe`, `net10.0-windows`, `UseWindowsForms=true`, optional `IsPublishable=false`, `Title`, `ApplicationIcon`, `Platforms=x64;x86`. Same canonical BUILD. PROJECT / META DATA order of section 3 is normative. |
+| Web | `Microsoft.NET.Sdk.Web` | Runnable artifact: `OutputPath ..\..\dist\<ArtifactName>`. May have the XML documentation copy target (section 6), a `wwwroot` folder and web-specific content. |
+| Test | `Microsoft.NET.Sdk` | No `OutputPath` (own `bin`). Conditional:
+`Platforms=x64;x86`. Same canonical BUILD with `OutputPath ..\..\dist\<ArtifactName>`.
 | Hybrid WinForms + WebView2 + ASP.NET Core | `Microsoft.NET.Sdk` | Uses `<FrameworkReference Include="Microsoft.AspNetCore.App" />` and optional WebView2 / ASP.NET packages **without** switching to `Microsoft.NET.Sdk.Web`. ASP.NET dependencies alone never force an SDK change. |
 
 ## 6. Conditional Feature Templates
@@ -382,7 +390,8 @@ The GUID is illustrative, not a required value. Preserve custom MSBuild targets 
 - [ ] `RootNamespace` / `Product` / `SourceContext` coherent and intentionally short where appropriate.
 - [ ] PROJECT and META DATA order kept; `ApplicationIcon` in META DATA.
 - [ ] `Nullable` present (`disable` if it was absent); an existing value not silently changed.
-- [ ] One shared output path; no hard-coded TFM directory, no `BaseOutputPath`.
+- [ ] One output path per project by role (`dist\Shared`, `dist\<ArtifactName>`, tests own `bin`); no hard-coded TFM directory, no `BaseOutputPath`.
+- [ ] No peer dependencies copied into `dist\Shared` (.NET Core); artifact bundles via copy-local / content, no bundling scripts.
 - [ ] `AppendTargetFrameworkToOutputPath=true`, `AppendRuntimeIdentifierToOutputPath=false`.
 - [ ] Documentation and package-generation flags explicit.
 - [ ] Custom framework constants follow the cumulative scheme; special constants kept.
@@ -401,7 +410,7 @@ The GUID is illustrative, not a required value. Preserve custom MSBuild targets 
 2. Classify every element: `STANDARD` / `CONDITIONAL STANDARD` / `PROJECT-SPECIFIC`.
 3. Align PROJECT and META DATA fields, keeping meaningful existing metadata.
 4. Introduce / normalize `SourceContext` only where the derivation is clear; ask if ambiguous.
-5. Apply the canonical BUILD with the single `OutputPath`, SDK TFM suffix, shared warnings and constants.
+5. Apply the canonical BUILD with the role-based `OutputPath`, SDK TFM suffix, shared warnings and constants.
 6. Collapse identical platform / configuration groups into the actual deltas.
 7. Keep package versions, package metadata, references, targets, generated resources, T4, content copy, globs and shared imports.
 8. Propose uncertain `ProjectReference` variants; never rewrite silently.
