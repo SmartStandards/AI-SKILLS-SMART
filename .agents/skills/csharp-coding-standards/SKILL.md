@@ -1,6 +1,6 @@
 ---
 name: csharp-coding-standards
-description: MANDATORY implementation constraint for writing, generating, reviewing or refactoring any C# source code - conservative, explicit C# coding standards ("syntactic salt over syntactic sugar"). Covers no var, explicit types, defensive nullability, _PascalCase fields and constants, this. qualification, expanded properties, XML summary documentation, brace and else/catch/finally layout, no ternary operator, parenthesized lambda parameters, arrays at API boundaries, purposeful exception handling with DevLogger.LogError, trace logging via DevLogger.LogTrace, no async/await by default, Newtonsoft.Json instead of System.Text.Json, no P/Invoke without approval, reserved placeholder syntaxes (_FOO_, #FOO#, {Foo}, [Foo]; prohibited (Foo), %FOO%), migration of existing code, documentation and test deliverables, and the leading .editorconfig (assets) mirrored into every repository. Load before producing C# code and use its agent checklist before returning code.
+brace and else/catch/finally layout, vertical whitespace and semantic grouping (no compressed method bodies), no ternary operator,
 metadata:
   version: "2026-10-21"
 ---
@@ -416,6 +416,79 @@ Lambda expressions SHOULD remain simple. Complex behavior SHOULD be extracted in
 - Line endings are CRLF (the landscape is developed almost exclusively on Windows).
 - File encoding: UTF-8; **with BOM is preferred** on Windows, but not enforced - do not convert existing files only to add or remove a BOM. Exceptions where tools require no BOM (e.g. npm `package.json`) take precedence.
 
+### 9.7 Vertical Whitespace and Semantic Grouping
+
+Code inside method bodies MUST NOT be compressed into dense, uninterrupted blocks. Blank lines MUST be used to make the structure of a method readable at a glance.
+
+Blank lines are not inserted mechanically after every statement. The guiding principle is **semantic grouping**: a few consecutive lines that belong together (for example the declaration of several related variables, or a short sequence that performs one logical step) form a group and stay together without blank lines. Different groups are separated by a blank line. Belonging to the same semantic group is the main reason for omitting a blank line.
+
+The following rules apply:
+
+1. **Method boundaries:** method bodies SHOULD start and end with a blank line (after the opening brace and before the closing brace), except for very short methods consisting of only one or two statements.
+2. **Around blocks:** control-flow blocks (`if`, `else`, `for`, `foreach`, `while`, `switch`, `try`, `using`, `lock`, and similar) SHOULD almost always be separated from the preceding and following code by a blank line. Exception: the block directly belongs to the immediately preceding statement as one semantic group (for example a variable declaration followed by a short guard check on exactly this variable).
+3. **Inside blocks:** when a block body becomes large enough to contain several semantic groups of its own, its body SHOULD also start and end with a blank line, and its inner groups SHOULD be separated by blank lines. Short block bodies (for example a single `return;` or a few closely related lines) remain compact.
+4. **Grouping:** related consecutive lines (for example up to about five related variable declarations or assignments) SHOULD NOT be separated by blank lines.
+5. Multiple consecutive blank lines SHOULD NOT be used.
+
+```csharp
+public bool TryResolveCustomer(string customerId, out Customer customer) {
+
+  customer = null;
+
+  if (string.IsNullOrWhiteSpace(customerId)) {
+    return false;
+  }
+
+  string normalizedId = customerId.Trim();
+  Customer[] candidates = this.LoadCandidates(normalizedId);
+  DateTime referenceDate = DateTime.UtcNow;
+
+  foreach (Customer candidate in candidates) {
+
+    if (!candidate.IsActive) {
+      continue;
+    }
+
+    bool isValid = candidate.ValidUntil > referenceDate;
+    bool isMatching = string.Equals(candidate.Id, normalizedId, StringComparison.Ordinal);
+
+    if (isValid && isMatching) {
+      customer = candidate;
+      return true;
+    }
+
+  }
+
+  return false;
+}
+```
+
+Do not write:
+
+```csharp
+public bool TryResolveCustomer(string customerId, out Customer customer) {
+  customer = null;
+  if (string.IsNullOrWhiteSpace(customerId)) {
+    return false;
+  }
+  string normalizedId = customerId.Trim();
+  Customer[] candidates = this.LoadCandidates(normalizedId);
+  DateTime referenceDate = DateTime.UtcNow;
+  foreach (Customer candidate in candidates) {
+    if (!candidate.IsActive) {
+      continue;
+    }
+    bool isValid = candidate.ValidUntil > referenceDate;
+    bool isMatching = string.Equals(candidate.Id, normalizedId, StringComparison.Ordinal);
+    if (isValid && isMatching) {
+      customer = candidate;
+      return true;
+    }
+  }
+  return false;
+}
+```
+
 ------
 
 ## 10. Collections and Method Signatures
@@ -795,6 +868,7 @@ This example intentionally favors explicit types, explicit control flow, arrays 
 | Ternary expressions          | Avoid for normal control flow                 | MUST NOT             |
 | Lambda parameters            | Always parenthesized                          | MUST                 |
 | Indentation                  | Two spaces, no tabs; CRLF                     | MUST                 |
+| Vertical whitespace          | Blank lines at method start/end, around control-flow blocks and inside larger blocks; omit only within semantic groups | SHOULD |
 | Encoding                     | UTF-8, BOM preferred, never mass-converted    | SHOULD               |
 | Collection signatures        | Prefer arrays                                 | SHOULD               |
 | Exception handling           | Catch only intentionally handled failures     | MUST                 |
@@ -825,6 +899,7 @@ Before returning generated C# code, the agent SHOULD verify at least the followi
 - ternary expressions were not introduced;
 - lambda parameters are parenthesized;
 - indentation uses two spaces;
+- method bodies are not compressed: blank lines separate semantic groups, method start/end, and control-flow blocks;
 - collection boundaries use arrays where appropriate;
 - nullable states are intentional;
 - exception handling is purposeful;

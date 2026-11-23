@@ -48,7 +48,8 @@ Formatting: two-space XML indentation, blank lines between conceptual sections, 
 - The project file base name (without `.csproj`) equals `AssemblyName`, `PackageId` and normally `Description` - except for the target-framework suffix of side-by-side variants (`Example.Contract.net8.0.csproj` builds `Example.Contract`; see `refactoring-processes`).
 - **No vendor prefix**: the vendor (GitHub owner or publisher) never appears in the project file name, project folder, `AssemblyName`, `RootNamespace`, `PackageId` or solution name (`Example.Product.net10.0.csproj`, not `Vendor.Example.Product.net10.0.csproj`). It appears only in package metadata (`Authors`, `Company`, `Copyright`; in the `.nuspec` `authors`, `owners`, `copyright`) and the repository URL. Product-family prefixes and existing names: see `smart-solution-and-project-structure`, `Repository Conventions`.
 - `Title` may be a distinct user-facing application title.
-- `Product`, `RootNamespace` and `SourceContext` are intentionally simpler than the full assembly identity, often derived from the first meaningful product / namespace token. The exact universal derivation is not settled yet; ask if ambiguous.
+- **`RootNamespace` is exactly the first segment of the project name** (everything before the first `.`, target-framework suffix ignored): `Example.Applications.Outpost.csproj` -> `<RootNamespace>Example</RootNamespace>`, `HtmlDocGen.net10.0.csproj` -> `HtmlDocGen`. Everything after the first segment is expressed by subfolders, which map 1:1 to namespace segments (`Applications\Outpost\MainForm.cs` -> `namespace Example.Applications.Outpost`). This keeps IDE0130 ("Namespace does not match folder structure") satisfied without suppression. Generated T4 snapshots are the only exception (see `dotnet-t4-source-embedding`).
+- `Product` and `SourceContext` are intentionally simpler than the full assembly identity, often derived from the first meaningful product / namespace token. The exact universal derivation is not settled yet; ask if ambiguous.
 - Preserve existing meaningful `Company`, `Copyright`, `Authors`, `Version`, `AssemblyVersion`, `FileVersion`. Never replace them with empty values or reset versions.
 - `Nullable`: if absent, set `<Nullable>disable</Nullable>` (in line with the defensive nullability of `csharp-coding-standards`). Never silently change an existing explicit value.
 - `ImplicitUsings`, `ImportedNamespaces`, `Deterministic` and `Configurations` are explicit where the designed state requires them.
@@ -66,7 +67,7 @@ Formatting: two-space XML indentation, blank lines between conceptual sections, 
   <IsPublishable>false</IsPublishable>
   <Title>Example Outpost</Title>
   <AssemblyName>Example.Applications.Outpost</AssemblyName>
-  <RootNamespace>Example.Applications</RootNamespace>
+  <RootNamespace>Example</RootNamespace>
   <Deterministic>false</Deterministic>
   <Nullable>disable</Nullable>
   <ImplicitUsings>enable</ImplicitUsings>
@@ -387,7 +388,8 @@ The GUID is illustrative, not a required value. Preserve custom MSBuild targets 
 - [ ] Correct SDK and target framework; WinForms stays `Microsoft.NET.Sdk`.
 - [ ] `AssemblyName` / `PackageId` / `Description` match the project file name; no vendor prefix in names.
 - [ ] Applications, tools and tests `IsPackable=false`; libraries packaged only via the standalone `.nuspec`.
-- [ ] `RootNamespace` / `Product` / `SourceContext` coherent and intentionally short where appropriate.
+- [ ] `RootNamespace` equals the first segment of the project name; deeper namespace segments come from subfolders.
+- [ ] `Product` / `SourceContext` coherent and intentionally short where appropriate.
 - [ ] PROJECT and META DATA order kept; `ApplicationIcon` in META DATA.
 - [ ] `Nullable` present (`disable` if it was absent); an existing value not silently changed.
 - [ ] One output path per project by role (`dist\Shared`, `dist\<ArtifactName>`, tests own `bin`); no hard-coded TFM directory, no `BaseOutputPath`.
@@ -421,7 +423,7 @@ When project files are normalized as part of bringing a whole solution up to dat
 
 ## 10. Open Issues
 
-1. Exact derivation of `RootNamespace`, `Product` and `SourceContext`.
+1. Exact derivation of `Product` and `SourceContext`. Resolved: `RootNamespace` = first segment of the project name, deeper segments via subfolders (section 3).
 2. Resolved 2026-10-21: absent `Nullable` becomes `disable` (section 3).
 3. Partly resolved 2026-10-21: cumulative symbol scheme (section 4). Open: confirmation for net8, symbols for .NET Framework targets (`net48`), which versions form the ladder (why `NET_8_` but no `NET_6_` / `NET_9_`).
 4. Resolved 2026-10-21: new output path stays canonical; consumers are checked and adapted (section 4).

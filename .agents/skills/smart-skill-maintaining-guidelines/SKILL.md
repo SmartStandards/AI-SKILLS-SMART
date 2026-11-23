@@ -33,7 +33,8 @@ General skills are not snapshots of one repository but cross-cutting, publishabl
 - `package-version-preferences-dot-net` - preferred NuGet version ranges, pins, status of competing technologies and reference solutions; reviewed cyclically with the user.
 - `dotnet-sdk-style-project-files` - designed state of SDK-style `.csproj` files: section order, identity, canonical BUILD, project-type modules, feature templates.
 - `nuget-semantic-versioning-kvu` - changelog-driven semantic versioning with KVU: changelog rules, `.nuspec` pre-processor configuration, command line, build pipeline procedure.
-- `refactoring-processes` - standardized high-level refactoring processes; currently bringing an existing solution up to date (analysis, plan, confirmation; target frameworks, renames, nuspec / KVU, bootstrap, conventions, design debt).
+- `asp-engine-webview-coupling` - WinForms/WebView2 utilities coupled to an in-memory ASP.NET Core engine with UJMW services, embedded UI resources and dual hosting.
+- `refactoring-processes` - standardized
 
 ## Purpose of This Repository
 
