@@ -71,6 +71,8 @@ if (launchProfileHelper.TryGetUrlsFromLaunchProfile(explicitLaunchProfile, out s
 | Environment variable / CLI override seems ignored | A branch file overrides it | Look for `appsettings.<Branch>.json` in the checkout |
 | Branch file not applied | Branch name contains `/`, detached HEAD, or no Git | `git rev-parse --abbrev-ref HEAD` |
 | With profile `Infra`: Swagger, user secrets, developer exception page or static web assets missing (present with `Development`) | Code or framework defaults depend on the environment name `Development` | Search for `IsDevelopment()`, `IsEnvironment(`, `IsProduction()`; see `Launch Profile and Configuration Design` |
+| WebView2 desktop host (in-memory, `WebViewAspNetCoreAdapter`): UI freezes on long requests, SignalR only long-polls | No WebSockets through `WebResourceRequested`; requests are dispatched on the UI thread | Short polling, native push via `PostWebMessageAsJson`; upstream skill, section "WebView2Template" |
+| WebView2 desktop host: `window.open` opens nothing new, right mouse button shows the browser menu | Adapter swallows new windows and enables default context menus | Open windows natively from the host; disable `AreDefaultContextMenusEnabled` after `Attach`; upstream skill, section "WebView2Template" |
 
 ## Launch Profile and Configuration Design
 
