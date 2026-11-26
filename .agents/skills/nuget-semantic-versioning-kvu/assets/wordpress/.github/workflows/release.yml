@@ -150,6 +150,8 @@ jobs:
           PY
 
       - name: Commit materialized repository state locally
+        env:
+          COMMIT_SUBJECT: ${{ steps.source.outputs.subject }}
         shell: bash
         run: |
           set -euo pipefail
@@ -161,7 +163,7 @@ jobs:
             exit 1
           fi
 
-          git commit -m "${{ steps.source.outputs.subject }} -> VERSIONING [skip ci]"
+          git commit -m "${COMMIT_SUBJECT} -> VERSIONING [skip ci]"
           git tag -a "${{ steps.build.outputs.tag }}" -m "Release ${{ steps.build.outputs.version }}"
 
       # Release assets are made available BEFORE master exposes the new *.update.json files.

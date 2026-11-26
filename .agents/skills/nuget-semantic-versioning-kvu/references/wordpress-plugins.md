@@ -21,7 +21,7 @@ Trigger: push to `master` (or manual `workflow_dispatch`). The job is skipped wh
    - write `doc/<slug>.update.json` (name, version, author, homepage, `download_url` of the release asset, requires, requires_php, description, changelog HTML of this release);
    - build `dist/<slug>.zip` with exactly one top-level folder `<slug>/`.
 5. Validate the generated state (headers, metadata version, bootstrap, ZIP layout).
-6. Commit everything as `<triggering subject> -> VERSIONING [skip ci]`, create the annotated tag `v<version>`.
+6. Commit everything as `<triggering subject> -> VERSIONING [skip ci]`, create the annotated tag `v<version>`. The subject reaches the shell only through an `env:` variable (`COMMIT_SUBJECT`), never as `${{ ... }}` inside `run:`: quotes (`"`), backticks or `$(...)` in a commit message would otherwise break the script or be executed.
 7. Push the tag, create the GitHub release `v<version>` with the ZIPs and the release notes, and only then push `master` - so a new `update.json` never points to an asset that does not exist yet.
 
 ## 2. Differences from KVU (`kvu.exe`)

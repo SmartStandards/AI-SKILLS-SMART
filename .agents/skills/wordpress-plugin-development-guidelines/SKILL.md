@@ -2,7 +2,7 @@
 name: wordpress-plugin-development-guidelines
 description: Uniform conventions for building WordPress plugins in the landscape - starting a new plugin (project language, minimum versions), repository layout of a plugin repository (WP-<Name>, one top-level plugin folder = slug, doc/, .kvu/, GitHub Actions release), the entry file <slug>.php (header fields, ABSPATH guard, pipeline-managed SELF-UPDATE block, autoloader, activation and boot hooks), PSR-4 namespaced classes with C#-like readable formatting, naming and prefixing of options, tables, hooks and REST routes, admin pages (capabilities, nonces, settings), data storage and uninstall (data is kept), security basics, testing without a WordPress installation, and what an agent must never edit by hand. Load when creating a new WordPress plugin, adding features to an existing plugin, reviewing plugin code, or bringing a plugin repository in line with the other plugins.
 metadata:
-  version: "2026-10-22"
+  version: "2026-11-24"
 ---
 
 # WordPress Plugin Development Guidelines
@@ -165,7 +165,10 @@ Layout and readability follow `csharp-coding-standards` (sections 4, 8, 9), so t
 
 ## 7. Data Storage and Lifecycle
 
-- Own tables via `dbDelta()` in the activation hook, with a schema-version option (`<short prefix>db_version`) and an upgrade check on boot, because activation hooks do not run on plugin updates.
+- Own tables are created in the activation hook, with a schema-version option (`<short prefix>db_version`) and an upgrade check on boot, because activation hooks do not run on plugin updates.
+- **An update must never lose or hide data.** Migrations are strictly additive: create missing tables, add missing columns and indexes, widen (var)char columns; never DROP, TRUNCATE, DELETE, RENAME, narrow or retype. New columns need a `DEFAULT` or `NULL`.
+- `dbDelta()` reads column definitions **line by line**: one column per line, `PRIMARY KEY  (id)` with two spaces. A one-line `CREATE TABLE` works on first install but silently skips every column added later - the plugin then queries non-existing columns and its data looks lost (incident in WP-CustomerCenter, 2026-11-24). Prefer an explicit migration (`SHOW COLUMNS` + `ALTER TABLE ... ADD COLUMN`) as in WP-CustomerCenter `src/Schema.php` / `src/Database.php`.
+- Store the new schema version only after verifying that every table and column exists; otherwise keep the old version, retry later and show an admin notice. Cover the migration with a standalone test that replays the previous schema state.
 - Times are stored in UTC.
 - Secrets (API keys, client secrets, tokens) are stored encrypted, never logged, and never shown in error messages.
 - Disposable data (caches) and non-disposable data (sync state, user data) are kept apart; only caches may be wiped automatically.
