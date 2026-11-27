@@ -51,7 +51,7 @@ The problem domains are the cut for snapshot skills. Their names follow the cut 
 | `smart-http-remoting-standard` | HTTP remoting protocol and framework | `UnifiedJsonMessageWrapper` |
 | `smart-service-ecosystem` | Endpoint resolution, service registry, cyclic triggering of services | `AddressResolving`, `CyclicTriggering` (?) |
 | `smart-authentication` | Access tokens: issuing, obtaining, caching, validating, forwarding | `AuthTokenHandling` |
-| `smart-persistence-entityframework-fusefx` | Data access via FUSE-fx and Entity Framework | `FUSE-fx.RepositoryContract`, `FUSE-fx.ModelDescription`, `FUSE-fx.ModelReader`, `FUSE-fx.EntityAnnotations`, `FUSE-fx.ModelDesigner`, `FUSE-fx.DynDB-EF`, `FUSE-fx.DynDB-JSONfs`, `FUSE-fx.DynDB-XLS`, `FUSE-fx.DynDB-SQL`, `FUSE-fx.WinForms`, `json-flatfile-datastore.FUSE-fx`, `EntityFrameworkCore.DataAccessFilter` |
+| `smart-persistence-entityframework-fusefx` (exists; EF + RepositoryContract + ModelDesigner part, 2026-11-27) | Data access via FUSE-fx and Entity Framework |
 | `nuget-semantic-versioning-kvu` (exists; general skill, named by user decision 2026-10-21) | Changelog-driven semantic versioning, packaging | `VersioningUtil` (KVU) |
 | `smart-solution-and-project-structure` (exists; template only so far) | Common repository conventions and the ASP.NET Core hosting template: shared projects, multi-targeting (net48/net8/net10), generated versioning artifacts, documentation layout | `AspNetCoreTemplate`; conventions of all .NET repositories (see their `most-important-details-for-*` skills) |
 | `smart-ushell-and-universalbff` | UShell frontend shell and the UniversalBFF backend-for-frontend | `UShell.*` (all `ProjectUShell` repositories), `UniversalBFF` |
@@ -91,9 +91,9 @@ Keep rows short. "Local folder" is only filled where developers commonly use a f
 | `FUSE-fx.DynDB-XLS` | | Excel/ClosedXML-backed FUSE repository implementation. | `most-important-details-for-fusefx-dyndb-xls` | - | |
 | `FUSE-fx.EntityAnnotations` | | FUSE entity metadata annotations. | `most-important-details-for-fusefx-entity-annotations` | - | v1.x published as package `EntityAnnotations`. |
 | `FUSE-fx.ModelDescription` | | Schema DOM for FUSE entity models. | `most-important-details-for-fusefx-model-description` | - | |
-| `FUSE-fx.ModelDesigner` | | Model / schema designer tooling. | `most-important-details-for-fusefx-model-designer` | - | |
+`most-important-details-for-fusefx-model-designer` | `smart-persistence-entityframework-fusefx` | |
 | `FUSE-fx.ModelReader` | | Reflection bridge from annotated entity models to FUSE model descriptions. | `most-important-details-for-fusefx-model-reader` | - | |
-| `FUSE-fx.RepositoryContract` | | Central FUSE repository contract (`IRepository<TEntity, TKey>`), stores, EF support. | `fuse-fx`, `most-important-details-for-fusefx-repository-contract` | - | Entry point for FUSE-fx. |
+`fuse-fx`, `most-important-details-for-fusefx-repository-contract` | `smart-persistence-entityframework-fusefx` | Entry point for FUSE-fx. |
 | `FUSE-fx.WinForms` | | Windows UI controls and presenters for FUSE repository data. | `most-important-details-for-fusefx-winforms` | - | |
 | `json-flatfile-datastore.FUSE-fx` | | JSON flat file data store (FUSE-adjacent fork). | `most-important-details-for-fusefx-json-flatfile-datastore` | - | Outside the active FUSE-fx core map. |
 | `KnowledgeManagement` | | ? | - | - | |
