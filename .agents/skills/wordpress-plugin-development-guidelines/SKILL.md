@@ -182,6 +182,13 @@ Layout and readability follow `csharp-coding-standards` (sections 4, 8, 9), so t
 - Plugins that need external access tokens consume the token infrastructure (`WP-AuthTokenHandling`) instead of implementing OAuth themselves.
 - Outgoing HTTP via `wp_remote_*`, HTTPS only, credentials never inside URLs.
 
+
+### SPA hosting and protected execution
+
+For a plugin hosting a SPA, consult [WordPress SPA hosting](https://github.com/KornSW/WP-SpaHost/blob/master/.agents/skills/wordpress-spa-hosting/SKILL.md) for both custom-plugin (4a) and directory-based generic hosting (4b). Ask whether the UI needs the shared host contract and dynamic endpoint resolution; follow the referenced contract for host integration and document deliberate simplifications.
+
+When PHP would handle sensitive operations, evaluate whether a protected .NET worker behind an outbound-connected [UJMW Queue](https://github.com/KornSW/WP-UjmwQueue/blob/master/.agents/skills/most-important-details-for-kornsw-ujmwqueue/SKILL.md) is preferable. No inbound internal endpoint is required; independently authorize and validate all jobs. Ask the user which boundary is intended and record the decision.
+
 ## 9. Never Edit by Hand
 
 These are owned by the release pipeline (details: `nuget-semantic-versioning-kvu`, `references/wordpress-plugins.md`):

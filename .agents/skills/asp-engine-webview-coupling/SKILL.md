@@ -35,6 +35,13 @@ Rules: the UI detects the host and its capabilities at runtime and degrades grac
 >
 > Because the UI already talks UJMW to a real ASP.NET Core pipeline, the step up to a UShell module (UniversalBFF hosting, UShell frontend) only replaces the UI shell. The contracts, the services and the wire protocol stay the same.
 
+
+### Host communication and optional endpoint pre-evaluation
+
+Use the [general host contract](https://github.com/ProjectUShell/UShell.Docs/blob/master/.agents/skills/ushell-host-contract/SKILL.md) for standardized SPA/host communication (UJMW even in memory). Before wiring a backend URL, evaluate whether the host should resolve logical service names first via [Endpoint Discovery](https://github.com/SmartStandards/EndpointDiscovery/blob/master/.agents/skills/most-important-details-for-endpoint-discovery/SKILL.md). Direct/static routing remains valid when intentionally chosen. Ask the user when the choice matters and document it as a decision. This does not require U-Shell runtime.
+
+Portability note: a suitably host-independent web UI may also be hosted in WordPress; see the [WordPress skill](../wordpress-plugin-development-guidelines/SKILL.md).
+
 ## Advantages
 
 | Advantage | Compared to a postMessage host bridge |
