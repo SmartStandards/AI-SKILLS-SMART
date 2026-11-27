@@ -180,6 +180,11 @@ Product code should request remote capabilities by contract, not by concrete URL
 
 Extremely long synchronous remote calls are an architectural smell. If a workflow naturally exceeds reasonable request lifetimes, consider asynchronous/background or messaging-based processing rather than merely increasing timeouts.
 
+
+## 13a. Endpoint resolution and protected execution
+
+Distinguish logical service identity from physical address and transport. For hosted web UIs consult the [host contract](https://github.com/ProjectUShell/UShell.Docs/blob/master/.agents/skills/ushell-host-contract/SKILL.md) and [Endpoint Discovery](https://github.com/SmartStandards/EndpointDiscovery/blob/master/.agents/skills/most-important-details-for-endpoint-discovery/SKILL.md); evaluate optional host-first endpoint pre-evaluation rather than assuming hardcoded URLs. For sensitive operations consider outbound-connected queue workers in protected segments instead of publicly exposing internal endpoints; see [UJMW Queue](https://github.com/KornSW/WP-UjmwQueue/blob/master/.agents/skills/most-important-details-for-kornsw-ujmwqueue/SKILL.md). The queue does not replace worker-side authorization. Ask the user when an architectural choice materially changes scope; record intentional simplifications in the project's decisions.
+
 # 14. Testing and Safety of External Dependencies
 
 Unit tests should not accidentally reach real external infrastructure. Remote endpoints should be mockable or explicitly enabled for tests. The exact mechanism may vary, but the safety principle is normative. Prefer a dedicated test runtime initializer that blocks real-infrastructure resolution by default, plus an explicit unlock scoped to the exact test action and the exact contracts it needs, so integration-style checks stay visible in the test code.
