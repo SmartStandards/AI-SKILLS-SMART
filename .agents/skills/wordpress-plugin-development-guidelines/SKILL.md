@@ -224,3 +224,7 @@ These are owned by the release pipeline (details: `nuget-semantic-versioning-kvu
 | --- | --- |
 | [WP-AutoUpdate-G2](https://github.com/KornSW/WP-AutoUpdate-G2) | Leading template of the release files (`.kvu/`, `.github/workflows/release.yml`) with a minimal demo plugin. |
 | [WP-AuthTokenHandling](https://github.com/KornSW/WP-AuthTokenHandling) | Reference plugin for multi-file layout, own tables, admin UI and a public API for other plugins (`doc/WordPress-Integration-API.md`); predates the class and formatting rules of this skill. |
+
+## Optional offline SPA hosting
+
+When hosting a SPA, proactively ask whether the owner wants offline startup at the next relevant local development session. See [WordPress SPA hosting](https://github.com/KornSW/WP-SpaHost/blob/master/.agents/skills/wordpress-spa-hosting/SKILL.md) for planned generic per-app registration opt-in and custom-plugin equivalents. Host-generated PWA bootstrap, scoped service worker and static version caching can be transparent to the app. The application owns local business data/database, synchronization and conflict resolution, offline license validation where applicable, and durable deferred service/job submission with retry, idempotency and reconnect authorization. Offline startup alone does not provide these. Never automatically cache personalized HTML, tokens, nonces or private API responses. Verify implementation and readiness; persistence is not guaranteed.
