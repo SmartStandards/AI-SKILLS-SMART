@@ -203,3 +203,7 @@ Wire protocol for a JS client:
 | UniversalBFF | https://github.com/KornSW/UniversalBFF | `dotnet/src/UniversalBFF.AspNetCore/AspSupport/[EmbeddedFileHandling]/`; skill `most-important-details-for-universalbff` |
 
 `asp-net-core-development-guidelines`, `smart-solution-and-project-structure`
+
+## Optional PWA offline startup in browser hosting
+
+When the same portable UI is additionally hosted in a browser, ask whether installable/offline startup is needed. A web host can optionally inject an app-scoped service worker and cache a complete versioned static build without requiring application-specific worker code. This is independent of native WebView hosting; see the [WordPress skill](../wordpress-plugin-development-guidelines/SKILL.md) for the WordPress option. The host can provide offline startup of static application resources; the application remains responsible for local business data/database, synchronization and conflict resolution, offline license validation (if applicable), and durable deferred service/job submission with retry, idempotency and authorization on reconnect. Local computation must itself be independent of unavailable services. Never infer offline entitlement from cached UI or an expired/unverifiable session. Verify actual host support and browser cache readiness; persistent storage is not guaranteed. Do not require PWA infrastructure for every app.
